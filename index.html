@@ -1,1530 +1,175 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>加密貨幣轉換器 - 多貨幣支援</title>
+    <title>加密貨幣轉換器 | 即時匯率</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        /* 即時價格 Banner */
-        .price-banner {
-            background: linear-gradient(90deg, #1e293b, #334155);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border: 1px solid #475569;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .price-banner::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #6c63ff, #8a84ff);
-        }
-        
-        .banner-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .banner-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-        
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: #ef4444;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
-        .refresh-btn {
-            background: rgba(108, 99, 255, 0.2);
-            border: 1px solid rgba(108, 99, 255, 0.3);
-            color: #6c63ff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        
-        .refresh-btn:hover {
-            background: rgba(108, 99, 255, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        @media (min-width: 768px) {
-            .price-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        .price-card {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid rgba(71, 85, 105, 0.3);
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .price-card:hover {
-            border-color: #6c63ff;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.2);
-        }
-        
-        .crypto-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        
-        .crypto-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .btc-icon { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .eth-icon { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; }
-        .bnb-icon { background: linear-gradient(135deg, #f0b90b, #d4a306); color: white; }
-        .sol-icon { background: linear-gradient(135deg, #14b8a6, #0d9488); color: white; }
-        .doge-icon { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .pepe-icon { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
-        
-        .crypto-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-        
-        .crypto-symbol {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        
-        .price-data {
-            margin-top: 8px;
-        }
-        
-        .current-price {
-            font-size: 18px;
-            font-weight: 700;
-            color: #e2e8f0;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
-        
-        .price-change {
-            font-size: 14px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-        
-        .positive { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .negative { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        
-        .last-updated {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        
-        /* 轉換器主體 */
-        .container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            background: rgba(25, 25, 40, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(100, 100, 255, 0.1);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        h1 {
-            font-size: 24px;
-            color: #6c63ff;
-            margin-bottom: 8px;
-        }
-        
-        .subtitle {
-            color: #aaa;
-            font-size: 14px;
-        }
-        
-        .converter-box {
-            background: rgba(30, 30, 50, 0.7);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(100, 100, 255, 0.15);
-        }
-        
-        .input-section {
-            margin-bottom: 20px;
-        }
-        
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .input-container {
-            flex: 1;
-            border: 1px solid #444;
-            border-radius: 10px;
-            overflow: hidden;
-            background: rgba(20, 20, 35, 0.8);
-            height: 60px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .input-container:focus-within {
-            border-color: #6c63ff;
-        }
-        
-        input {
-            width: 100%;
-            padding: 15px;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 18px;
-            outline: none;
-        }
-        
-        /* 下拉選單 */
-        .select-wrapper {
-            position: relative;
-            width: 160px;
-            height: 60px;
-            flex-shrink: 0;
-        }
-        
-        select {
-            width: 100%;
-            height: 100%;
-            padding: 15px 40px 15px 15px;
-            background: rgba(40, 40, 70, 0.9);
-            border: 1px solid #444;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            outline: none;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-        }
-        
-        select option {
-            background: #2a2a4a;
-            color: white;
-            padding: 12px;
-            font-size: 14px;
-            height: 40px;
-            line-height: 40px;
-        }
-        
-        .select-arrow {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c63ff;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .swap-button {
-            text-align: center;
-            margin: 15px 0;
-        }
-        
-        .swap-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(108, 99, 255, 0.2);
-            border: 1px solid rgba(108, 99, 255, 0.3);
-            color: #6c63ff;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: all 0.3s;
-        }
-        
-        .swap-btn:hover {
-            background: rgba(108, 99, 255, 0.3);
-            transform: rotate(180deg);
-        }
-        
-        .convert-button {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .convert-btn {
-            background: linear-gradient(90deg, #6c63ff, #8a84ff);
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-        }
-        
-        .convert-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.4);
-        }
-        
-        .rate-display {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(20, 20, 35, 0.5);
-            border-radius: 10px;
-            border: 1px solid rgba(100, 100, 255, 0.1);
-        }
-        
-        .rate-text {
-            font-size: 14px;
-            color: #aaa;
-            margin-bottom: 5px;
-        }
-        
-        .rate-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #6c63ff;
-        }
-        
-        .change-indicator {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            background: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
-            margin-left: 10px;
-        }
-        
-        /* 快捷貨幣按鈕 */
-        .quick-currencies {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-        
-        .quick-currency {
-            padding: 6px 12px;
-            background: rgba(108, 99, 255, 0.1);
-            border: 1px solid rgba(108, 99, 255, 0.3);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #8a84ff;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .quick-currency:hover {
-            background: rgba(108, 99, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* 計算機按鈕 */
-        .calculator-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .calc-btn {
-            padding: 12px;
-            background: rgba(40, 40, 70, 0.9);
-            border: 1px solid #444;
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-        
-        .calc-btn:hover {
-            background: rgba(108, 99, 255, 0.3);
-            border-color: #6c63ff;
-            transform: translateY(-2px);
-        }
-        
-        .calc-btn.clear {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: #ef4444;
-            color: #ef4444;
-        }
-        
-        .calc-btn.equals {
-            background: linear-gradient(90deg, #6c63ff, #8a84ff);
-            border: none;
-            color: white;
-        }
-        
-        .calc-btn.zero {
-            grid-column: span 2;
-        }
-        
-        .calculator-toggle {
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .toggle-calc-btn {
-            background: rgba(108, 99, 255, 0.1);
-            border: 1px solid rgba(108, 99, 255, 0.3);
-            color: #8a84ff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .toggle-calc-btn:hover {
-            background: rgba(108, 99, 255, 0.2);
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 25px;
-            color: #666;
-            font-size: 12px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .loading {
-            display: inline-block;
-            margin-left: 10px;
-            font-size: 12px;
-            color: #6c63ff;
-        }
-        
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-        
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
-        }
-        
-        @media (max-width: 480px) {
-            .price-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
-                padding: 20px;
-            }
-            
-            .converter-box {
-                padding: 20px;
-            }
-            
-            .input-row {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .select-wrapper {
-                width: 100%;
-                height: 55px;
-            }
-            
-            .banner-header {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- 即時價格 Banner -->
-    <div class="price-banner">
-        <div class="banner-header">
-            <div class="banner-title">
-                <i class="fas fa-chart-line"></i>
-                加密貨幣實時價格
-                <span class="live-badge">
-                    <i class="fas fa-circle"></i> LIVE
-                </span>
-            </div>
-            <button class="refresh-btn" id="refresh-prices">
-                <i class="fas fa-sync-alt"></i>
-                更新價格
-            </button>
-        </div>
-        
-        <div class="price-grid">
-            <!-- BTC 價格卡 -->
-            <div class="price-card" data-crypto="BTC">
-                <div class="crypto-info">
-                    <div class="crypto-icon btc-icon">₿</div>
-                    <div>
-                        <div class="crypto-name">比特幣</div>
-                        <div class="crypto-symbol">BTC</div>
-                    </div>
-                </div>
-                <div class="price-data">
-                    <div class="current-price" id="btc-price">
-                        <span id="btc-price-value">載入中</span>
-                        <span class="loading" id="btc-loading"></span>
-                    </div>
-                    <div class="price-change" id="btc-change">--</div>
-                </div>
-            </div>
-            
-            <!-- ETH 價格卡 -->
-            <div class="price-card" data-crypto="ETH">
-                <div class="crypto-info">
-                    <div class="crypto-icon eth-icon">Ξ</div>
-                    <div>
-                        <div class="crypto-name">以太坊</div>
-                        <div class="crypto-symbol">ETH</div>
-                    </div>
-                </div>
-                <div class="price-data">
-                    <div class="current-price" id="eth-price">
-                        <span id="eth-price-value">載入中</span>
-                        <span class="loading" id="eth-loading"></span>
-                    </div>
-                    <div class="price-change" id="eth-change">--</div>
-                </div>
-            </div>
-            
-            <!-- DOGE 價格卡 -->
-            <div class="price-card" data-crypto="DOGE">
-                <div class="crypto-info">
-                    <div class="crypto-icon doge-icon">Ð</div>
-                    <div>
-                        <div class="crypto-name">狗狗幣</div>
-                        <div class="crypto-symbol">DOGE</div>
-                    </div>
-                </div>
-                <div class="price-data">
-                    <div class="current-price" id="doge-price">
-                        <span id="doge-price-value">載入中</span>
-                        <span class="loading" id="doge-loading"></span>
-                    </div>
-                    <div class="price-change" id="doge-change">--</div>
-                </div>
-            </div>
-            
-            <!-- PEPE 價格卡 -->
-            <div class="price-card" data-crypto="PEPE">
-                <div class="crypto-info">
-                    <div class="crypto-icon pepe-icon">🐸</div>
-                    <div>
-                        <div class="crypto-name">佩佩幣</div>
-                        <div class="crypto-symbol">PEPE</div>
-                    </div>
-                </div>
-                <div class="price-data">
-                    <div class="current-price" id="pepe-price">
-                        <span id="pepe-price-value">載入中</span>
-                        <span class="loading" id="pepe-loading"></span>
-                    </div>
-                    <div class="price-change" id="pepe-change">--</div>
-                </div>
-            </div>
-            
-            <!-- BNB 價格卡 -->
-            <div class="price-card" data-crypto="BNB">
-                <div class="crypto-info">
-                    <div class="crypto-icon bnb-icon">⏣</div>
-                    <div>
-                        <div class="crypto-name">幣安幣</div>
-                        <div class="crypto-symbol">BNB</div>
-                    </div>
-                </div>
-                <div class="price-data">
-                    <div class="current-price" id="bnb-price">
-                        <span id="bnb-price-value">載入中</span>
-                        <span class="loading" id="bnb-loading"></span>
-                    </div>
-                    <div class="price-change" id="bnb-change">--</div>
-                </div>
-            </div>
-            
-            <!-- SOL 價格卡 -->
-            <div class="price-card" data-crypto="SOL">
-                <div class="crypto-info">
-                    <div class="crypto-icon sol-icon">◎</div>
-                    <div>
-                        <div class="crypto-name">Solana</div>
-                        <div class="crypto-symbol">SOL</div>
-                    </div>
-                </div>
-                <div class="price-data">
-                    <div class="current-price" id="sol-price">
-                        <span id="sol-price-value">載入中</span>
-                        <span class="loading" id="sol-loading"></span>
-                    </div>
-                    <div class="price-change" id="sol-change">--</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="last-updated" id="last-updated">
-            最後更新: <span id="update-time">--</span>
-            <span class="loading" id="update-loading"></span>
-        </div>
-    </div>
-    
-    <!-- 轉換器主體 -->
     <div class="container">
-        <div class="header">
-            <h1>加密貨幣轉換器</h1>
-            <p class="subtitle">支援多國貨幣 · 實時價格</p>
-        </div>
-        
-        <div class="converter-box">
-            <div class="input-section">
-                <div class="input-row">
-                    <div class="input-container">
-                        <input type="number" id="amount-from" value="1" placeholder="輸入金額">
+        <!-- 標題區域 -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-coins"></i>
+                <h1>加密貨幣轉換器</h1>
+            </div>
+            <p class="subtitle">支援 BTC、ETH、DOGE、PEPE 等即時價格轉換</p>
+        </header>
+
+        <!-- 主要轉換區域 -->
+        <main class="converter">
+            <div class="converter-card">
+                <!-- 輸入區域 -->
+                <div class="input-section">
+                    <div class="amount-input">
+                        <label for="amount">金額</label>
+                        <div class="input-group">
+                            <input type="number" id="amount" value="1" min="0" step="any">
+                            <button class="btn-clear" onclick="clearAmount()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="select-wrapper">
-                        <select id="currency-from">
-                            <optgroup label="🔵 加密貨幣">
-                                <option value="BTC">BTC (比特幣)</option>
-                                <option value="ETH" selected>ETH (以太坊)</option>
-                                <option value="BNB">BNB (幣安幣)</option>
-                                <option value="SOL">SOL (Solana)</option>
-                                <option value="XRP">XRP (瑞波幣)</option>
-                                <option value="DOGE">DOGE (狗狗幣)</option>
-                                <option value="ADA">ADA (卡爾達諾)</option>
-                                <option value="DOT">DOT (波卡幣)</option>
-                                <option value="PEPE">PEPE (佩佩幣)</option>
-                            </optgroup>
-                            <optgroup label="💵 法幣與穩定幣">
-                                <option value="USDT">USDT (泰達幣)</option>
-                                <option value="USD">USD (美元)</option>
-                                <option value="HKD">HKD (港幣)</option>
-                                <option value="JPY">JPY (日圓)</option>
-                            </optgroup>
-                        </select>
-                        <div class="select-arrow">
-                            <i class="fas fa-chevron-down"></i>
+
+                    <div class="currency-selectors">
+                        <!-- 從加密貨幣 -->
+                        <div class="currency-select">
+                            <label for="fromCurrency">從</label>
+                            <select id="fromCurrency">
+                                <option value="BTC">BTC - 比特幣</option>
+                                <option value="ETH">ETH - 以太幣</option>
+                                <option value="DOGE">DOGE - 狗狗幣</option>
+                                <option value="PEPE">PEPE - 佩佩幣</option>
+                                <option value="USDT">USDT - 泰達幣</option>
+                                <option value="BNB">BNB - 幣安幣</option>
+                                <option value="XRP">XRP - 瑞波幣</option>
+                                <option value="ADA">ADA - 艾達幣</option>
+                                <option value="SOL">SOL - Solana</option>
+                            </select>
+                        </div>
+
+                        <!-- 交換按鈕 -->
+                        <div class="swap-btn-container">
+                            <button class="btn-swap" onclick="swapCurrencies()">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+
+                        <!-- 到貨幣 -->
+                        <div class="currency-select">
+                            <label for="toCurrency">到</label>
+                            <select id="toCurrency">
+                                <option value="HKD">HKD - 港幣</option>
+                                <option value="USD">USD - 美元</option>
+                                <option value="CNY">CNY - 人民幣</option>
+                                <option value="JPY">JPY - 日圓</option>
+                                <option value="EUR">EUR - 歐元</option>
+                                <option value="TWD">TWD - 新台幣</option>
+                                <option value="USDT">USDT - 泰達幣</option>
+                                <option value="BTC">BTC - 比特幣</option>
+                                <option value="ETH">ETH - 以太幣</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="swap-button">
-                <button class="swap-btn" id="swap-btn">
-                    <i class="fas fa-exchange-alt"></i>
-                </button>
-            </div>
-            
-            <div class="input-section">
-                <div class="input-row">
-                    <div class="input-container">
-                        <input type="number" id="amount-to" value="" readonly placeholder="轉換結果">
-                    </div>
-                    <div class="select-wrapper">
-                        <select id="currency-to">
-                            <optgroup label="🔵 加密貨幣">
-                                <option value="BTC">BTC (比特幣)</option>
-                                <option value="ETH">ETH (以太坊)</option>
-                                <option value="BNB">BNB (幣安幣)</option>
-                                <option value="SOL">SOL (Solana)</option>
-                                <option value="XRP">XRP (瑞波幣)</option>
-                                <option value="DOGE" selected>DOGE (狗狗幣)</option>
-                                <option value="ADA">ADA (卡爾達諾)</option>
-                                <option value="DOT">DOT (波卡幣)</option>
-                                <option value="PEPE">PEPE (佩佩幣)</option>
-                            </optgroup>
-                            <optgroup label="💵 法幣與穩定幣">
-                                <option value="USDT">USDT (泰達幣)</option>
-                                <option value="USD">USD (美元)</option>
-                                <option value="HKD">HKD (港幣)</option>
-                                <option value="JPY">JPY (日圓)</option>
-                            </optgroup>
-                        </select>
-                        <div class="select-arrow">
-                            <i class="fas fa-chevron-down"></i>
+
+                <!-- 結果區域 -->
+                <div class="result-section">
+                    <div class="result-display">
+                        <div class="result-amount" id="resultAmount">
+                            <span class="loading">載入中...</span>
                         </div>
+                        <div class="result-details">
+                            <div class="rate-info">
+                                <i class="fas fa-sync-alt"></i>
+                                <span id="currentRate">正在獲取匯率...</span>
+                            </div>
+                            <div class="time-info" id="lastUpdate">
+                                最後更新: --
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 立即轉換按鈕 -->
+                    <button class="btn-convert" onclick="convertCurrency()" id="convertBtn">
+                        <i class="fas fa-calculator"></i>
+                        立即轉換
+                    </button>
+                </div>
+
+                <!-- 快捷貨幣 -->
+                <div class="quick-currencies">
+                    <h3><i class="fas fa-bolt"></i> 快速轉換</h3>
+                    <div class="quick-buttons" id="quickButtons">
+                        <!-- 動態生成 -->
                     </div>
                 </div>
             </div>
-            
-            <div class="quick-currencies">
-                <div class="quick-currency" data-currency="BTC">BTC</div>
-                <div class="quick-currency" data-currency="ETH">ETH</div>
-                <div class="quick-currency" data-currency="DOGE">DOGE</div>
-                <div class="quick-currency" data-currency="PEPE">PEPE</div>
-                <div class="quick-currency" data-currency="USDT">USDT</div>
-                <div class="quick-currency" data-currency="USD">USD</div>
-                <div class="quick-currency" data-currency="HKD">HKD</div>
-                <div class="quick-currency" data-currency="JPY">JPY</div>
+
+            <!-- 計算機 -->
+            <div class="calculator-card">
+                <h3><i class="fas fa-calculator"></i> 計算機</h3>
+                <div class="calculator">
+                    <input type="text" id="calcDisplay" readonly value="0">
+                    <div class="calc-buttons">
+                        <button onclick="calcInput('7')">7</button>
+                        <button onclick="calcInput('8')">8</button>
+                        <button onclick="calcInput('9')">9</button>
+                        <button onclick="calcInput('/')">/</button>
+                        
+                        <button onclick="calcInput('4')">4</button>
+                        <button onclick="calcInput('5')">5</button>
+                        <button onclick="calcInput('6')">6</button>
+                        <button onclick="calcInput('*')">*</button>
+                        
+                        <button onclick="calcInput('1')">1</button>
+                        <button onclick="calcInput('2')">2</button>
+                        <button onclick="calcInput('3')">3</button>
+                        <button onclick="calcInput('-')">-</button>
+                        
+                        <button onclick="calcInput('0')">0</button>
+                        <button onclick="calcInput('.')">.</button>
+                        <button onclick="calcCalculate()">=</button>
+                        <button onclick="calcInput('+')">+</button>
+                        
+                        <button onclick="calcClear()" class="btn-clear-calc">C</button>
+                        <button onclick="calcBackspace()" class="btn-backspace">
+                            <i class="fas fa-backspace"></i>
+                        </button>
+                        <button onclick="useCalcResult()" class="btn-use-result">
+                            使用結果
+                        </button>
+                    </div>
+                </div>
             </div>
-            
-            <div class="rate-display">
-                <div class="rate-text">當前匯率</div>
-                <div class="rate-value" id="rate-value">載入中...</div>
-                <span class="change-indicator" id="change-indicator">--</span>
+        </main>
+
+        <!-- 狀態欄 -->
+        <footer class="footer">
+            <div class="status-bar">
+                <div class="status-item">
+                    <i class="fas fa-database"></i>
+                    <span>數據源: CoinGecko API</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-sync-alt"></i>
+                    <span id="updateStatus">每30秒自動更新</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>即時數據 ∙ SSL安全</span>
+                </div>
             </div>
-            
-            <div class="calculator-toggle">
-                <button class="toggle-calc-btn" id="toggle-calc-btn">
-                    <i class="fas fa-calculator"></i> 顯示計算機
-                </button>
+            <div class="copyright">
+                <p>© 2023 加密貨幣轉換器 | 即時匯率工具</p>
             </div>
-            
-            <div class="calculator-buttons" id="calculator-buttons" style="display: none;">
-                <button class="calc-btn" data-value="7">7</button>
-                <button class="calc-btn" data-value="8">8</button>
-                <button class="calc-btn" data-value="9">9</button>
-                <button class="calc-btn clear" data-action="clear">C</button>
-                <button class="calc-btn" data-value="4">4</button>
-                <button class="calc-btn" data-value="5">5</button>
-                <button class="calc-btn" data-value="6">6</button>
-                <button class="calc-btn" data-action="backspace">⌫</button>
-                <button class="calc-btn" data-value="1">1</button>
-                <button class="calc-btn" data-value="2">2</button>
-                <button class="calc-btn" data-value="3">3</button>
-                <button class="calc-btn" data-action="decimal">.</button>
-                <button class="calc-btn zero" data-value="0">0</button>
-                <button class="calc-btn" data-value="00">00</button>
-                <button class="calc-btn equals" data-action="equals">=</button>
-            </div>
-            
-            <div class="convert-button">
-                <button class="convert-btn" id="convert-btn">
-                    <i class="fas fa-sync-alt"></i> 立即轉換
-                </button>
-            </div>
-        </div>
-        
-        <div class="footer">
-            數據更新: <span id="auto-update-status">每30秒自動更新</span>
-        </div>
+        </footer>
     </div>
 
-    <script>
-        // ===================== 幣安API配置 =====================
-        const BINANCE_API = {
-            baseUrl: 'https://api.binance.com/api/v3',
-            
-            // 幣安交易對映射
-            symbols: {
-                'BTC': 'BTCUSDT',
-                'ETH': 'ETHUSDT',
-                'BNB': 'BNBUSDT',
-                'SOL': 'SOLUSDT',
-                'XRP': 'XRPUSDT',
-                'DOGE': 'DOGEUSDT',
-                'ADA': 'ADAUSDT',
-                'DOT': 'DOTUSDT',
-                'PEPE': 'PEPEUSDT',
-                'MATIC': 'MATICUSDT',
-                'AVAX': 'AVAXUSDT',
-                'LINK': 'LINKUSDT',
-                'UNI': 'UNIUSDT',
-                'LTC': 'LTCUSDT'
-            }
-        };
-
-        // 匯率數據緩存
-        let exchangeRates = {};
-        let priceChanges = {};
-        let lastUpdateTime = null;
-
-        // 法幣匯率（備用數據，如果API失敗時使用）
-        const fiatRates = {
-            'USD': 1.00,
-            'HKD': 7.83,
-            'JPY': 150.50,
-            'USDT': 1.00
-        };
-
-        // DOM 元素
-        const amountFrom = document.getElementById('amount-from');
-        const amountTo = document.getElementById('amount-to');
-        const currencyFrom = document.getElementById('currency-from');
-        const currencyTo = document.getElementById('currency-to');
-        const swapBtn = document.getElementById('swap-btn');
-        const convertBtn = document.getElementById('convert-btn');
-        const rateValue = document.getElementById('rate-value');
-        const changeIndicator = document.getElementById('change-indicator');
-        const updateTime = document.getElementById('update-time');
-        const refreshBtn = document.getElementById('refresh-prices');
-        const toggleCalcBtn = document.getElementById('toggle-calc-btn');
-        const calculatorButtons = document.getElementById('calculator-buttons');
-        const autoUpdateStatus = document.getElementById('auto-update-status');
-        
-        // 價格顯示元素
-        const btcPriceValue = document.getElementById('btc-price-value');
-        const btcChange = document.getElementById('btc-change');
-        const ethPriceValue = document.getElementById('eth-price-value');
-        const ethChange = document.getElementById('eth-change');
-        const dogePriceValue = document.getElementById('doge-price-value');
-        const dogeChange = document.getElementById('doge-change');
-        const pepePriceValue = document.getElementById('pepe-price-value');
-        const pepeChange = document.getElementById('pepe-change');
-        const bnbPriceValue = document.getElementById('bnb-price-value');
-        const bnbChange = document.getElementById('bnb-change');
-        const solPriceValue = document.getElementById('sol-price-value');
-        const solChange = document.getElementById('sol-change');
-
-        // ===================== 幣安API功能 =====================
-        
-        // 獲取單個貨幣價格
-        async function getCryptoPrice(symbol) {
-            try {
-                // 檢查是否有幣安交易對映射
-                if (BINANCE_API.symbols[symbol]) {
-                    const binanceSymbol = BINANCE_API.symbols[symbol];
-                    
-                    try {
-                        const response = await fetch(`${BINANCE_API.baseUrl}/ticker/24hr?symbol=${binanceSymbol}`);
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            
-                            return {
-                                price: parseFloat(data.lastPrice),
-                                change: parseFloat(data.priceChangePercent),
-                                high: parseFloat(data.highPrice),
-                                low: parseFloat(data.lowPrice),
-                                volume: parseFloat(data.volume),
-                                source: 'binance'
-                            };
-                        }
-                    } catch (binanceError) {
-                        console.warn(`獲取 ${symbol} 價格失敗:`, binanceError);
-                    }
-                }
-                
-                // 如果幣安失敗，嘗試其他API
-                return await getBackupCryptoPrice(symbol);
-                
-            } catch (error) {
-                console.error(`獲取 ${symbol} 價格失敗:`, error);
-                return null;
-            }
-        }
-
-        // 備用API獲取價格
-        async function getBackupCryptoPrice(symbol) {
-            try {
-                // 嘗試使用其他API
-                const coinIdMap = {
-                    'BTC': 'bitcoin',
-                    'ETH': 'ethereum',
-                    'BNB': 'binancecoin',
-                    'SOL': 'solana',
-                    'XRP': 'ripple',
-                    'DOGE': 'dogecoin',
-                    'ADA': 'cardano',
-                    'DOT': 'polkadot',
-                    'PEPE': 'pepe',
-                    'USDT': 'tether'
-                };
-                
-                const coinId = coinIdMap[symbol];
-                if (!coinId) return null;
-                
-                // 嘗試CoinGecko API
-                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    if (data[coinId]) {
-                        return {
-                            price: data[coinId].usd,
-                            change: data[coinId].usd_24h_change || 0,
-                            source: 'coingecko'
-                        };
-                    }
-                }
-                
-                return null;
-                
-            } catch (error) {
-                console.warn(`備用API獲取 ${symbol} 價格失敗:`, error);
-                return null;
-            }
-        }
-
-        // 獲取法幣匯率
-        async function getFiatRates() {
-            try {
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    // 更新法幣匯率
-                    if (data.rates) {
-                        fiatRates['USD'] = 1.00;
-                        fiatRates['HKD'] = data.rates['HKD'] || 7.83;
-                        fiatRates['JPY'] = data.rates['JPY'] || 150.50;
-                        fiatRates['USDT'] = 1.00;
-                        
-                        return true;
-                    }
-                }
-                
-                return false;
-                
-            } catch (error) {
-                console.warn('獲取法幣匯率失敗，使用備用數據:', error);
-                return false;
-            }
-        }
-
-        // 批量獲取價格
-        async function fetchAllPrices() {
-            // 獲取加密貨幣價格
-            const cryptoSymbols = ['BTC', 'ETH', 'BNB', 'SOL', 'DOGE', 'PEPE', 'XRP'];
-            const promises = cryptoSymbols.map(symbol => getCryptoPrice(symbol));
-            
-            // 獲取法幣匯率
-            const fiatPromise = getFiatRates();
-            
-            try {
-                const [cryptoResults] = await Promise.all([
-                    Promise.all(promises),
-                    fiatPromise
-                ]);
-                
-                // 更新加密貨幣匯率數據
-                cryptoSymbols.forEach((symbol, index) => {
-                    if (cryptoResults[index]) {
-                        exchangeRates[symbol] = cryptoResults[index].price;
-                        priceChanges[symbol] = cryptoResults[index].change;
-                    }
-                });
-                
-                // 更新法幣匯率數據
-                exchangeRates['USD'] = fiatRates['USD'];
-                exchangeRates['HKD'] = fiatRates['HKD'];
-                exchangeRates['JPY'] = fiatRates['JPY'];
-                exchangeRates['USDT'] = fiatRates['USDT'];
-                priceChanges['USD'] = 0;
-                priceChanges['HKD'] = 0;
-                priceChanges['JPY'] = 0;
-                priceChanges['USDT'] = 0;
-                
-                // 確保所有需要的貨幣都有價格
-                ensureAllPrices();
-                
-                // 更新顯示
-                updatePriceDisplay();
-                updateConverterDisplay();
-                lastUpdateTime = new Date();
-                updateTime.textContent = lastUpdateTime.toLocaleTimeString('zh-TW', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                
-                return true;
-            } catch (error) {
-                console.error('批量獲取價格失敗:', error);
-                // 使用備用數據
-                ensureAllPrices();
-                updatePriceDisplay();
-                updateConverterDisplay();
-                return false;
-            }
-        }
-
-        // 確保所有貨幣都有價格數據
-        function ensureAllPrices() {
-            // 貨幣列表
-            const allCurrencies = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'DOGE', 'ADA', 'DOT', 'PEPE', 'USD', 'HKD', 'JPY', 'USDT'];
-            
-            // 備用價格數據（如果API失敗）
-            const backupPrices = {
-                'BTC': 45000.00,
-                'ETH': 3000.00,
-                'BNB': 350.00,
-                'SOL': 120.00,
-                'XRP': 0.52,
-                'DOGE': 0.08,
-                'ADA': 0.50,
-                'DOT': 6.50,
-                'PEPE': 0.0000012,
-                'USD': 1.00,
-                'HKD': 7.83,
-                'JPY': 150.50,
-                'USDT': 1.00
-            };
-            
-            // 備用價格變動
-            const backupChanges = {
-                'BTC': 1.2,
-                'ETH': 0.8,
-                'BNB': -0.5,
-                'SOL': 2.1,
-                'XRP': 0.3,
-                'DOGE': 5.2,
-                'ADA': -1.1,
-                'DOT': 0.7,
-                'PEPE': 8.5,
-                'USD': 0,
-                'HKD': 0,
-                'JPY': 0,
-                'USDT': 0
-            };
-            
-            // 檢查並填充缺失的價格
-            allCurrencies.forEach(currency => {
-                if (exchangeRates[currency] === undefined || isNaN(exchangeRates[currency])) {
-                    exchangeRates[currency] = backupPrices[currency];
-                }
-                if (priceChanges[currency] === undefined || isNaN(priceChanges[currency])) {
-                    priceChanges[currency] = backupChanges[currency];
-                }
-            });
-        }
-
-        // 更新價格顯示
-        function updatePriceDisplay() {
-            // BTC
-            if (exchangeRates['BTC']) {
-                btcPriceValue.textContent = `$${exchangeRates['BTC'].toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                if (priceChanges['BTC'] !== undefined) {
-                    const change = priceChanges['BTC'];
-                    btcChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    btcChange.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-                }
-            }
-            
-            // ETH
-            if (exchangeRates['ETH']) {
-                ethPriceValue.textContent = `$${exchangeRates['ETH'].toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                if (priceChanges['ETH'] !== undefined) {
-                    const change = priceChanges['ETH'];
-                    ethChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    ethChange.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-                }
-            }
-            
-            // DOGE
-            if (exchangeRates['DOGE']) {
-                dogePriceValue.textContent = `$${exchangeRates['DOGE'].toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}`;
-                if (priceChanges['DOGE'] !== undefined) {
-                    const change = priceChanges['DOGE'];
-                    dogeChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    dogeChange.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-                }
-            }
-            
-            // PEPE
-            if (exchangeRates['PEPE']) {
-                // PEPE價格通常很小，顯示更多小數位
-                const pepePrice = exchangeRates['PEPE'];
-                if (pepePrice < 0.000001) {
-                    pepePriceValue.textContent = `$${pepePrice.toFixed(10)}`;
-                } else if (pepePrice < 0.001) {
-                    pepePriceValue.textContent = `$${pepePrice.toFixed(8)}`;
-                } else {
-                    pepePriceValue.textContent = `$${pepePrice.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}`;
-                }
-                
-                if (priceChanges['PEPE'] !== undefined) {
-                    const change = priceChanges['PEPE'];
-                    pepeChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    pepeChange.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-                }
-            }
-            
-            // BNB
-            if (exchangeRates['BNB']) {
-                bnbPriceValue.textContent = `$${exchangeRates['BNB'].toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                if (priceChanges['BNB'] !== undefined) {
-                    const change = priceChanges['BNB'];
-                    bnbChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    bnbChange.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-                }
-            }
-            
-            // SOL
-            if (exchangeRates['SOL']) {
-                solPriceValue.textContent = `$${exchangeRates['SOL'].toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                if (priceChanges['SOL'] !== undefined) {
-                    const change = priceChanges['SOL'];
-                    solChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    solChange.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-                }
-            }
-            
-            // 隱藏載入動畫
-            document.querySelectorAll('.loading').forEach(el => {
-                el.style.display = 'none';
-            });
-        }
-
-        // ===================== 轉換器功能 =====================
-        
-        // 更新轉換器顯示
-        function updateConverterDisplay() {
-            convertCurrency();
-        }
-
-        // 轉換函數
-        function convertCurrency() {
-            const fromCurrency = currencyFrom.value;
-            const toCurrency = currencyTo.value;
-            const amount = parseFloat(amountFrom.value) || 0;
-
-            if (isNaN(amount) || amount < 0) {
-                amountTo.value = '';
-                rateValue.textContent = '請輸入有效金額';
-                changeIndicator.textContent = '--';
-                changeIndicator.style.background = 'rgba(149, 165, 166, 0.2)';
-                changeIndicator.style.color = '#95a5a6';
-                return;
-            }
-
-            if (fromCurrency === toCurrency) {
-                amountTo.value = amount;
-                rateValue.textContent = `1 ${fromCurrency} = 1 ${toCurrency}`;
-                changeIndicator.textContent = '0.0%';
-                changeIndicator.style.background = 'rgba(149, 165, 166, 0.2)';
-                changeIndicator.style.color = '#95a5a6';
-                return;
-            }
-
-            const fromRate = exchangeRates[fromCurrency];
-            const toRate = exchangeRates[toCurrency];
-
-            if (fromRate && toRate) {
-                // 所有價格都以美元為基礎，所以轉換公式是：
-                // 1. 將來源貨幣轉換為美元價值
-                // 2. 將美元價值轉換為目標貨幣
-                const usdValue = amount * fromRate; // 來源貨幣的美元價值
-                const result = usdValue / toRate;   // 轉換為目標貨幣
-                
-                // 計算匯率
-                const rate = fromRate / toRate;
-                
-                // 格式化結果
-                let formattedResult;
-                if (toCurrency === 'PEPE' || result < 0.000001) {
-                    formattedResult = result.toFixed(10);
-                } else if (result < 0.001) {
-                    formattedResult = result.toFixed(8);
-                } else if (result < 1) {
-                    formattedResult = result.toFixed(6);
-                } else {
-                    formattedResult = result.toLocaleString('en-US', { 
-                        minimumFractionDigits: 2, 
-                        maximumFractionDigits: 8 
-                    });
-                }
-                
-                amountTo.value = formattedResult;
-                
-                // 格式化匯率顯示
-                let formattedRate;
-                if (rate < 0.000001) {
-                    formattedRate = rate.toFixed(10);
-                } else if (rate < 0.001) {
-                    formattedRate = rate.toFixed(8);
-                } else if (rate < 1) {
-                    formattedRate = rate.toFixed(6);
-                } else if (rate < 1000) {
-                    formattedRate = rate.toLocaleString('en-US', { 
-                        minimumFractionDigits: 2, 
-                        maximumFractionDigits: 6 
-                    });
-                } else {
-                    formattedRate = rate.toLocaleString('en-US', { 
-                        minimumFractionDigits: 0, 
-                        maximumFractionDigits: 2 
-                    });
-                }
-                
-                rateValue.textContent = `1 ${fromCurrency} = ${formattedRate} ${toCurrency}`;
-                
-                // 顯示價格變動
-                const change = priceChanges[fromCurrency] || 0;
-                if (priceChanges[fromCurrency] !== undefined) {
-                    changeIndicator.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    
-                    if (change > 0) {
-                        changeIndicator.style.background = 'rgba(46, 204, 113, 0.2)';
-                        changeIndicator.style.color = '#2ecc71';
-                    } else if (change < 0) {
-                        changeIndicator.style.background = 'rgba(231, 76, 60, 0.2)';
-                        changeIndicator.style.color = '#e74c3c';
-                    } else {
-                        changeIndicator.style.background = 'rgba(149, 165, 166, 0.2)';
-                        changeIndicator.style.color = '#95a5a6';
-                    }
-                } else {
-                    changeIndicator.textContent = '穩定';
-                    changeIndicator.style.background = 'rgba(149, 165, 166, 0.2)';
-                    changeIndicator.style.color = '#95a5a6';
-                }
-            } else {
-                // 如果缺少價格數據，嘗試獲取
-                if (!fromRate || !toRate) {
-                    ensureAllPrices();
-                    // 重試轉換
-                    setTimeout(convertCurrency, 100);
-                } else {
-                    amountTo.value = '';
-                    rateValue.textContent = '等待價格數據...';
-                    changeIndicator.textContent = '--';
-                }
-            }
-        }
-
-        // 交換貨幣
-        function swapCurrencies() {
-            const tempCurrency = currencyFrom.value;
-            currencyFrom.value = currencyTo.value;
-            currencyTo.value = tempCurrency;
-            
-            convertCurrency();
-            
-            swapBtn.style.transform = 'rotate(360deg)';
-            setTimeout(() => {
-                swapBtn.style.transform = '';
-            }, 300);
-        }
-
-        // ===================== 計算機功能 =====================
-        
-        // 計算機功能
-        function setupCalculator() {
-            let currentInput = '';
-            let lastResult = '';
-            
-            // 計算機按鈕點擊事件
-            calculatorButtons.addEventListener('click', function(e) {
-                if (e.target.classList.contains('calc-btn')) {
-                    const value = e.target.getAttribute('data-value');
-                    const action = e.target.getAttribute('data-action');
-                    
-                    // 動畫反饋
-                    e.target.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        e.target.style.transform = '';
-                    }, 150);
-                    
-                    if (value !== null) {
-                        // 數字按鈕
-                        handleNumberInput(value);
-                    } else if (action !== null) {
-                        // 功能按鈕
-                        handleCalculatorAction(action);
-                    }
-                }
-            });
-            
-            // 數字輸入處理
-            function handleNumberInput(num) {
-                // 如果當前顯示的是結果，則開始新的輸入
-                if (amountFrom.value === lastResult && lastResult !== '') {
-                    currentInput = '';
-                    lastResult = '';
-                }
-                
-                // 避免多個小數點
-                if (num === '.' && currentInput.includes('.')) {
-                    return;
-                }
-                
-                // 避免數字過長
-                if (currentInput.length >= 15) {
-                    return;
-                }
-                
-                // 添加數字
-                currentInput += num;
-                amountFrom.value = currentInput;
-                
-                // 立即轉換
-                convertCurrency();
-            }
-            
-            // 計算機功能按鈕處理
-            function handleCalculatorAction(action) {
-                switch(action) {
-                    case 'clear':
-                        // 清除輸入
-                        currentInput = '';
-                        amountFrom.value = '0';
-                        amountTo.value = '';
-                        rateValue.textContent = '已清除';
-                        break;
-                        
-                    case 'backspace':
-                        // 刪除最後一個字符
-                        if (currentInput.length > 0) {
-                            currentInput = currentInput.slice(0, -1);
-                            amountFrom.value = currentInput || '0';
-                        }
-                        break;
-                        
-                    case 'decimal':
-                        // 添加小數點
-                        if (!currentInput.includes('.')) {
-                            currentInput += currentInput === '' ? '0.' : '.';
-                            amountFrom.value = currentInput;
-                        }
-                        break;
-                        
-                    case 'equals':
-                        // 記錄當前結果
-                        lastResult = amountTo.value;
-                        break;
-                }
-                
-                // 轉換計算
-                convertCurrency();
-            }
-            
-            // 切換計算機顯示/隱藏
-            toggleCalcBtn.addEventListener('click', function() {
-                const isHidden = calculatorButtons.style.display === 'none';
-                calculatorButtons.style.display = isHidden ? 'grid' : 'none';
-                this.innerHTML = isHidden ? 
-                    '<i class="fas fa-times"></i> 隱藏計算機' : 
-                    '<i class="fas fa-calculator"></i> 顯示計算機';
-                
-                // 動畫
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-            });
-        }
-
-        // ===================== 其他功能 =====================
-        
-        // 快捷貨幣選擇
-        function setupQuickCurrencies() {
-            const quickCurrencyButtons = document.querySelectorAll('.quick-currency');
-            
-            quickCurrencyButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const currency = this.getAttribute('data-currency');
-                    currencyTo.value = currency;
-                    convertCurrency();
-                    
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                });
-            });
-        }
-
-        // 點擊價格卡快速選擇貨幣
-        function setupPriceCardInteractions() {
-            const priceCards = document.querySelectorAll('.price-card');
-            
-            priceCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    priceCards.forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const crypto = this.getAttribute('data-crypto');
-                    
-                    const choice = confirm(`將 ${crypto} 設置為哪個選項？\n\n確定 = 設置為「從」貨幣\n取消 = 設置為「兌換為」貨幣`);
-                    
-                    if (choice) {
-                        currencyFrom.value = crypto;
-                    } else {
-                        currencyTo.value = crypto;
-                    }
-                    
-                    convertCurrency();
-                    
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                });
-            });
-        }
-
-        // 更新價格按鈕
-        function setupRefreshButton() {
-            refreshBtn.addEventListener('click', async function() {
-                // 顯示載入狀態
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 更新中...';
-                this.disabled = true;
-                
-                document.querySelectorAll('.loading').forEach(el => {
-                    el.style.display = 'inline';
-                });
-                
-                updateTime.innerHTML = '更新中<span class="loading"></span>';
-                
-                // 獲取新價格
-                const success = await fetchAllPrices();
-                
-                // 恢復按鈕狀態
-                this.innerHTML = '<i class="fas fa-sync-alt"></i> 更新價格';
-                this.disabled = false;
-                
-                if (success) {
-                    // 成功反饋
-                    this.style.background = 'rgba(34, 197, 94, 0.2)';
-                    this.style.borderColor = '#22c55e';
-                    this.style.color = '#22c55e';
-                    
-                    setTimeout(() => {
-                        this.style.background = '';
-                        this.style.borderColor = '';
-                        this.style.color = '';
-                    }, 1000);
-                } else {
-                    // 失敗反饋
-                    this.style.background = 'rgba(239, 68, 68, 0.2)';
-                    this.style.borderColor = '#ef4444';
-                    this.style.color = '#ef4444';
-                    
-                    setTimeout(() => {
-                        this.style.background = '';
-                        this.style.borderColor = '';
-                        this.style.color = '';
-                    }, 2000);
-                }
-            });
-        }
-
-        // 初始化
-        async function init() {
-            // 設置事件監聽
-            amountFrom.addEventListener('input', convertCurrency);
-            currencyFrom.addEventListener('change', convertCurrency);
-            currencyTo.addEventListener('change', convertCurrency);
-            swapBtn.addEventListener('click', swapCurrencies);
-            convertBtn.addEventListener('click', convertCurrency);
-            
-            // 設置計算機
-            setupCalculator();
-            
-            // 設置快捷貨幣
-            setupQuickCurrencies();
-            
-            // 設置價格卡交互
-            setupPriceCardInteractions();
-            
-            // 設置更新按鈕
-            setupRefreshButton();
-            
-            // 初始載入價格
-            await fetchAllPrices();
-            
-            // 初始轉換
-            convertCurrency();
-            
-            // 定時更新價格（每30秒）
-            setInterval(async () => {
-                await fetchAllPrices();
-            }, 30000);
-        }
-
-        // 頁面加載時初始化
-        window.addEventListener('DOMContentLoaded', init);
-    </script>
+    <!-- 載入 JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>
