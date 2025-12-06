@@ -2,7 +2,7 @@
 // 配置設定
 // ======================
 const CONFIG = {
-    COINGECKO_API_KEY: '你的_API_Key_這裡', // 👈 替換成你的 CoinGecko API Key
+    COINGECKO_API_KEY: 'CG-uv86KDk1FuMqbYqFmxtuAUL8', // 👈 替換成你的 CoinGecko API Key
     COINGECKO_BASE_URL: 'https://api.coingecko.com/api/v3',
     UPDATE_INTERVAL: 30000, // 30秒更新一次
     CACHE_DURATION: 60000, // 1分鐘緩存
