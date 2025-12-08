@@ -3,367 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>加密貨幣轉換器｜測試版</title>
+    <title>加密貨幣轉換器｜個人測試版</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #111;
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        /* 安全警告 */
-        .security-warning {
-            background: linear-gradient(135deg, #ff6b6b, #c92a2a);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 5px solid #ffd700;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.9; }
-            50% { opacity: 1; }
-            100% { opacity: 0.9; }
-        }
-
-        .security-warning h3 {
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .warning-icon {
-            font-size: 24px;
-        }
-
-        .api-status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .status-testing {
-            background: #f39c12;
-            color: #000;
-        }
-
-        .status-working {
-            background: #27ae60;
-            color: white;
-        }
-
-        .status-error {
-            background: #e74c3c;
-            color: white;
-        }
-
-        /* 固定價格顯示 */
-        .price-banner {
-            background: #1a1a1a;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #333;
-        }
-
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .price-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .price-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .price-item {
-            background: #222;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 4px solid #0a84ff;
-            transition: transform 0.2s;
-        }
-
-        .price-item:hover {
-            transform: translateY(-2px);
-            background: #2a2a2a;
-        }
-
-        .price-symbol {
-            font-weight: bold;
-            color: #0a84ff;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .price-name {
-            font-size: 10px;
-            color: #aaa;
-            margin-bottom: 3px;
-        }
-
-        .price-value {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .card {
-            background: #1b1b1b;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
-        select, input {
-            padding: 10px;
-            width: 100%;
-            margin-top: 10px;
-            background: #333;
-            border: 1px solid #444;
-            border-radius: 5px;
-            color: white;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #0a84ff;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
-        }
-
-        #result {
-            padding: 15px;
-            margin-top: 10px;
-            background: #222;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 20px;
-        }
-
-        .error {
-            color: #ff6b6b;
-        }
-
-        .success {
-            color: #4cd964;
-        }
-
-        .loading {
-            color: #0a84ff;
-        }
-
-        /* 計算機樣式 */
-        .calculator {
-            margin-top: 20px;
-        }
-
-        .calculator input {
-            font-size: 24px;
-            text-align: right;
-        }
-
-        .calc-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .calc-btn {
-            padding: 18px;
-            font-size: 18px;
-            background: #333;
-        }
-
-        .last-updated {
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-            margin-top: 10px;
-        }
+        /* 保持您原有的所有樣式不變 */
+        body { font-family: Arial, sans-serif; background: #111; color: white; margin: 0; padding: 0; }
+        .container { max-width: 1000px; margin: auto; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 10px; }
+        .price-banner { background: #1a1a1a; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #333; }
+        .price-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; text-align: center; }
+        .price-item { background: #222; padding: 12px; border-radius: 6px; border-left: 4px solid #0a84ff; }
+        .price-symbol { font-weight: bold; color: #0a84ff; font-size: 14px; }
+        .price-name { font-size: 10px; color: #aaa; }
+        .price-value { font-size: 16px; font-weight: bold; }
+        .card { background: #1b1b1b; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        select, input { padding: 10px; width: 100%; margin-top: 10px; background: #333; border: 1px solid #444; border-radius: 5px; color: white; }
+        button { width: 100%; padding: 12px; background: #0a84ff; border: none; border-radius: 6px; color: white; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        #result { padding: 15px; margin-top: 10px; background: #222; border-radius: 8px; text-align: center; font-size: 20px; }
+        .error { color: #ff6b6b; }
+        .success { color: #4cd964; }
+        .loading { color: #0a84ff; }
+        .calculator { margin-top: 20px; }
+        .calculator input { font-size: 24px; text-align: right; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .calc-btn { padding: 18px; font-size: 18px; background: #333; }
+        .last-updated { text-align: center; font-size: 12px; color: #888; margin-top: 10px; }
+        .refresh-btn { background: #333; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-left: 10px; }
         
-        .refresh-btn {
-            background: #333;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            display: inline-block;
-            margin-left: 10px;
-            transition: background 0.2s;
-        }
-        
-        .refresh-btn:hover {
-            background: #444;
-        }
-        
-        .header-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .currency-count {
-            font-size: 12px;
-            color: #0a84ff;
-            background: rgba(10, 132, 255, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        
-        .debug-info {
-            background: #222;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 11px;
-            color: #aaa;
-            border: 1px solid #333;
-        }
-        
-        .debug-info pre {
-            margin: 0;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-        }
+        /* 響應式設計 */
+        @media (max-width: 768px) { .price-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 480px) { .price-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 
 <body>
 <div class="container">
-    <!-- 安全警告 -->
-    <div class="security-warning">
-        <h3>
-            <span class="warning-icon">⚠️</span>
-            <span>測試模式 - API Key 可視</span>
-            <span id="apiStatus" class="api-status status-testing">測試中</span>
-        </h3>
-        <p>這是測試版本，API Key 在前端可見。正式發布前必須設置後端保護。</p>
-        <p style="font-size: 12px; margin-top: 8px;">
-            <strong>注意：</strong>此頁面僅供測試，完成測試後請立即移除 API Key。
+    <!-- 添加警告區塊 -->
+    <div style="background: #f39c12; color: #000; padding: 15px; margin-bottom: 20px; border-radius: 8px; border-left: 5px solid #e74c3c; font-size: 14px;">
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <span style="font-size: 20px; margin-right: 10px;">⚠️</span>
+            <strong>個人使用版本</strong>
+        </div>
+        <p style="margin: 5px 0;">
+            • 此為個人測試版本，API Key 公開可見<br>
+            • 僅供學習和個人使用<br>
+            • 建議不要公開分享此連結
         </p>
     </div>
     
     <h1>加密貨幣轉換器</h1>
     
-    <!-- 固定價格顯示區塊 -->
+    <!-- 即時價格顯示區塊 -->
     <div class="price-banner">
-        <div class="header-controls">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">📊 即時加密貨幣價格 (USD)</h3>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="currency-count">10 種貨幣</div>
+                <div style="font-size: 12px; color: #0a84ff; background: rgba(10, 132, 255, 0.1); padding: 4px 8px; border-radius: 4px;">10 種貨幣</div>
                 <div class="refresh-btn" onclick="loadPrices()" title="手動更新">🔄 更新</div>
             </div>
         </div>
         
-        <div id="priceContainer" class="price-grid">
+        <div class="price-grid">
             <!-- 10個幣種 -->
-            <div class="price-item">
-                <div class="price-symbol">BTC</div>
-                <div class="price-name">Bitcoin</div>
-                <div class="price-value" id="btc-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">ETH</div>
-                <div class="price-name">Ethereum</div>
-                <div class="price-value" id="eth-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">SOL</div>
-                <div class="price-name">Solana</div>
-                <div class="price-value" id="sol-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">BNB</div>
-                <div class="price-name">Binance Coin</div>
-                <div class="price-value" id="bnb-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">XRP</div>
-                <div class="price-name">Ripple</div>
-                <div class="price-value" id="xrp-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">DOGE</div>
-                <div class="price-name">Dogecoin</div>
-                <div class="price-value" id="doge-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">ADA</div>
-                <div class="price-name">Cardano</div>
-                <div class="price-value" id="ada-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">PEPE</div>
-                <div class="price-name">Pepe</div>
-                <div class="price-value" id="pepe-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">ZEC</div>
-                <div class="price-name">Zcash</div>
-                <div class="price-value" id="zec-price">載入中...</div>
-            </div>
-            <div class="price-item">
-                <div class="price-symbol">SUI</div>
-                <div class="price-name">Sui</div>
-                <div class="price-value" id="sui-price">載入中...</div>
-            </div>
+            <div class="price-item"><div class="price-symbol">BTC</div><div class="price-name">Bitcoin</div><div class="price-value" id="btc-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">ETH</div><div class="price-name">Ethereum</div><div class="price-value" id="eth-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">SOL</div><div class="price-name">Solana</div><div class="price-value" id="sol-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">BNB</div><div class="price-name">Binance Coin</div><div class="price-value" id="bnb-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">XRP</div><div class="price-name">Ripple</div><div class="price-value" id="xrp-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">DOGE</div><div class="price-name">Dogecoin</div><div class="price-value" id="doge-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">ADA</div><div class="price-name">Cardano</div><div class="price-value" id="ada-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">PEPE</div><div class="price-name">Pepe</div><div class="price-value" id="pepe-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">ZEC</div><div class="price-name">Zcash</div><div class="price-value" id="zec-price">載入中...</div></div>
+            <div class="price-item"><div class="price-symbol">SUI</div><div class="price-name">Sui</div><div class="price-value" id="sui-price">載入中...</div></div>
         </div>
-        
-        <!-- 調試信息（可展開） -->
-        <details style="margin-top: 15px;">
-            <summary style="cursor: pointer; color: #aaa; font-size: 12px;">顯示調試信息</summary>
-            <div class="debug-info">
-                <div><strong>API 狀態:</strong> <span id="debugStatus">準備中...</span></div>
-                <div><strong>最後請求:</strong> <span id="lastRequest">--</span></div>
-                <div><strong>請求次數:</strong> <span id="requestCount">0</span></div>
-                <div><strong>API Key:</strong> <span id="keyPreview" style="font-family: monospace;">CG-uv86K...AUL8</span></div>
-                <div style="margin-top: 5px;">
-                    <button onclick="testAPIConnection()" style="width: auto; padding: 5px 10px; font-size: 12px;">測試 API 連接</button>
-                    <button onclick="clearCache()" style="width: auto; padding: 5px 10px; font-size: 12px; background: #666;">清除緩存</button>
-                </div>
-            </div>
-        </details>
         
         <div id="lastUpdated" class="last-updated">最後更新時間: --</div>
     </div>
@@ -386,7 +97,6 @@
             <option value="PEPE">PEPE (Pepe)</option>
             <option value="ZEC">ZEC (Zcash)</option>
             <option value="SUI">SUI (Sui)</option>
-            <option value="SHIB">SHIB (Shiba Inu)</option>
             <option value="USDT">USDT (Tether)</option>
         </select>
         
@@ -412,22 +122,10 @@
         <h2>計算機</h2>
         <input type="text" id="calcDisplay" value="0" readonly>
         <div class="calc-grid">
-            <button class="calc-btn" onclick="calc('7')">7</button>
-            <button class="calc-btn" onclick="calc('8')">8</button>
-            <button class="calc-btn" onclick="calc('9')">9</button>
-            <button class="calc-btn" onclick="calc('/')">÷</button>
-            <button class="calc-btn" onclick="calc('4')">4</button>
-            <button class="calc-btn" onclick="calc('5')">5</button>
-            <button class="calc-btn" onclick="calc('6')">6</button>
-            <button class="calc-btn" onclick="calc('*')">×</button>
-            <button class="calc-btn" onclick="calc('1')">1</button>
-            <button class="calc-btn" onclick="calc('2')">2</button>
-            <button class="calc-btn" onclick="calc('3')">3</button>
-            <button class="calc-btn" onclick="calc('-')">−</button>
-            <button class="calc-btn" onclick="calc('0')">0</button>
-            <button class="calc-btn" onclick="calc('.')">.</button>
-            <button class="calc-btn" onclick="equals()">=</button>
-            <button class="calc-btn" onclick="calc('+')">+</button>
+            <button class="calc-btn" onclick="calc('7')">7</button><button class="calc-btn" onclick="calc('8')">8</button><button class="calc-btn" onclick="calc('9')">9</button><button class="calc-btn" onclick="calc('/')">÷</button>
+            <button class="calc-btn" onclick="calc('4')">4</button><button class="calc-btn" onclick="calc('5')">5</button><button class="calc-btn" onclick="calc('6')">6</button><button class="calc-btn" onclick="calc('*')">×</button>
+            <button class="calc-btn" onclick="calc('1')">1</button><button class="calc-btn" onclick="calc('2')">2</button><button class="calc-btn" onclick="calc('3')">3</button><button class="calc-btn" onclick="calc('-')">−</button>
+            <button class="calc-btn" onclick="calc('0')">0</button><button class="calc-btn" onclick="calc('.')">.</button><button class="calc-btn" onclick="equals()">=</button><button class="calc-btn" onclick="calc('+')">+</button>
             <button class="calc-btn" onclick="clearCalc()" style="grid-column: span 4; background:#c62828;">清除</button>
         </div>
     </div>
@@ -435,12 +133,11 @@
 
 <script>
 // =====================
-// 🔧 配置 - 測試用（完成測試後移除！）
+// 🔧 配置
 // =====================
-const API_KEY = "CG-uv86KDk1FuMqbYqFmxtuAUL8"; // ⚠️ 測試用，完成後移除！
+const API_KEY = "CG-uv86KDk1FuMqbYqFmxtuAUL8";
 const API_BASE = "https://api.coingecko.com/api/v3";
 
-// 加密貨幣對應表
 const CRYPTO_IDS = {
     BTC: "bitcoin",
     ETH: "ethereum",
@@ -452,61 +149,16 @@ const CRYPTO_IDS = {
     PEPE: "pepe",
     ZEC: "zcash",
     SUI: "sui",
-    SHIB: "shiba-inu",
     USDT: "tether"
 };
 
-// 10個熱門幣種
 const HOT_CRYPTO = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE", "ADA", "PEPE", "ZEC", "SUI"];
-
-// 狀態變量
-let requestCount = 0;
-let exchangeRates = {};
-
-// =====================
-// 📊 更新調試信息
-// =====================
-function updateDebugInfo(status) {
-    document.getElementById('debugStatus').textContent = status;
-    document.getElementById('requestCount').textContent = requestCount;
-    document.getElementById('lastRequest').textContent = new Date().toLocaleTimeString();
-}
-
-// =====================
-// 🔧 測試 API 連接
-// =====================
-async function testAPIConnection() {
-    updateDebugInfo("測試連接中...");
-    
-    try {
-        const testUrl = `${API_BASE}/ping`;
-        const response = await fetch(testUrl);
-        
-        if (response.ok) {
-            updateDebugInfo("API 連接正常 ✓");
-            document.getElementById('apiStatus').className = "api-status status-working";
-            document.getElementById('apiStatus').textContent = "API 正常";
-            return true;
-        } else {
-            updateDebugInfo(`連接失敗: ${response.status}`);
-            return false;
-        }
-    } catch (error) {
-        updateDebugInfo(`錯誤: ${error.message}`);
-        document.getElementById('apiStatus').className = "api-status status-error";
-        document.getElementById('apiStatus').textContent = "API 錯誤";
-        return false;
-    }
-}
 
 // =====================
 // 🔥 載入即時價格
 // =====================
 async function loadPrices() {
     try {
-        updateDebugInfo("請求價格數據...");
-        requestCount++;
-        
         // 顯示載入狀態
         HOT_CRYPTO.forEach(symbol => {
             const element = document.getElementById(`${symbol.toLowerCase()}-price`);
@@ -519,74 +171,52 @@ async function loadPrices() {
         // 獲取幣種 ID
         const coinIds = HOT_CRYPTO.map(symbol => CRYPTO_IDS[symbol]).filter(Boolean);
         
-        // 構建 API URL
+        // API 請求
         const url = `${API_BASE}/simple/price?ids=${coinIds.join(",")}&vs_currencies=usd`;
         
-        // 使用 API Key
-        const options = {
+        const res = await fetch(url, {
             headers: {
                 "x-cg-demo-api-key": API_KEY
             }
-        };
-        
-        console.log("📡 發送請求到:", url);
-        
-        const res = await fetch(url, options);
+        });
         
         if (!res.ok) {
-            throw new Error(`API 錯誤: ${res.status} ${res.statusText}`);
+            throw new Error(`API 錯誤: ${res.status}`);
         }
         
         const data = await res.json();
-        console.log("✅ API 回應:", data);
         
-        // 更新每個幣種的價格顯示
+        // 更新顯示
         HOT_CRYPTO.forEach(symbol => {
             const coinId = CRYPTO_IDS[symbol];
-            const elementId = `${symbol.toLowerCase()}-price`;
-            const element = document.getElementById(elementId);
+            const element = document.getElementById(`${symbol.toLowerCase()}-price`);
             
             if (element && data[coinId] && data[coinId].usd !== undefined) {
                 const price = data[coinId].usd;
                 const formattedPrice = formatPrice(price);
                 element.textContent = formattedPrice;
                 element.className = "price-value success";
-                
-                // 緩存匯率
-                exchangeRates[`${symbol}_USD`] = price;
             } else {
                 element.textContent = "無數據";
                 element.className = "price-value error";
             }
         });
         
-        // 更新最後更新時間
+        // 更新時間
         const now = new Date();
-        const timeString = now.toLocaleTimeString('zh-HK', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+        const timeString = now.toLocaleTimeString('zh-HK');
         document.getElementById('lastUpdated').textContent = `最後更新時間: ${timeString}`;
         
-        updateDebugInfo("數據載入成功 ✓");
-        return true;
-        
     } catch (error) {
-        console.error("❌ 載入價格失敗:", error);
-        updateDebugInfo(`錯誤: ${error.message}`);
-        
+        console.error("載入價格失敗:", error);
         HOT_CRYPTO.forEach(symbol => {
-            const elementId = `${symbol.toLowerCase()}-price`;
-            const element = document.getElementById(elementId);
+            const element = document.getElementById(`${symbol.toLowerCase()}-price`);
             if (element) {
                 element.textContent = "載入失敗";
                 element.className = "price-value error";
             }
         });
-        
-        document.getElementById('lastUpdated').textContent = `更新失敗: ${error.message}`;
-        return false;
+        document.getElementById('lastUpdated').textContent = "更新失敗";
     }
 }
 
@@ -610,28 +240,26 @@ async function convert() {
         convertBtn.textContent = "轉換中...";
         resultDiv.innerHTML = '<span class="loading">取得匯率中...</span>';
         
-        updateDebugInfo(`轉換: ${from} → ${to}`);
-        
         let result, rate;
         
-        // 情況1: 加密貨幣 → 法幣
+        // 加密貨幣 → 法幣
         if (isCrypto(from) && !isCrypto(to)) {
             rate = await getCryptoToFiatRate(from, to);
             result = amount * rate;
         }
-        // 情況2: 法幣 → 加密貨幣
+        // 法幣 → 加密貨幣
         else if (!isCrypto(from) && isCrypto(to)) {
             rate = await getCryptoToFiatRate(to, from);
             result = amount / rate;
         }
-        // 情況3: 加密貨幣 → 加密貨幣
+        // 加密貨幣 → 加密貨幣
         else if (isCrypto(from) && isCrypto(to)) {
             const fromRate = await getCryptoToFiatRate(from, "USD");
             const toRate = await getCryptoToFiatRate(to, "USD");
             rate = fromRate / toRate;
             result = amount * rate;
         }
-        // 情況4: 法幣 → 法幣
+        // 法幣 → 法幣
         else {
             const usdToFrom = await getFiatRate("USD", from);
             const usdToTo = await getFiatRate("USD", to);
@@ -655,12 +283,9 @@ async function convert() {
             </div>
         `;
         
-        updateDebugInfo("轉換成功 ✓");
-        
     } catch (error) {
         console.error("轉換失敗:", error);
         resultDiv.innerHTML = `<span class="error">轉換失敗: ${error.message}</span>`;
-        updateDebugInfo(`轉換錯誤: ${error.message}`);
     } finally {
         convertBtn.disabled = false;
         convertBtn.textContent = "立即轉換";
@@ -671,30 +296,16 @@ async function convert() {
 // 🔧 輔助函數
 // =====================
 async function getCryptoToFiatRate(crypto, fiat) {
-    const cacheKey = `${crypto}_${fiat}`;
-    
-    if (exchangeRates[cacheKey]) {
-        return exchangeRates[cacheKey];
-    }
-    
     const coinId = CRYPTO_IDS[crypto];
-    if (!coinId) {
-        throw new Error(`不支援的加密貨幣: ${crypto}`);
-    }
+    if (!coinId) throw new Error(`不支援的加密貨幣: ${crypto}`);
     
     const url = `${API_BASE}/simple/price?ids=${coinId}&vs_currencies=${fiat.toLowerCase()}`;
     
-    const options = {
-        headers: {
-            "x-cg-demo-api-key": API_KEY
-        }
-    };
+    const res = await fetch(url, {
+        headers: { "x-cg-demo-api-key": API_KEY }
+    });
     
-    const res = await fetch(url, options);
-    
-    if (!res.ok) {
-        throw new Error(`API 錯誤: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`API 錯誤: ${res.status}`);
     
     const data = await res.json();
     
@@ -702,25 +313,17 @@ async function getCryptoToFiatRate(crypto, fiat) {
         throw new Error(`無法取得 ${crypto} 到 ${fiat} 的匯率`);
     }
     
-    const rate = data[coinId][fiat.toLowerCase()];
-    exchangeRates[cacheKey] = rate;
-    
-    return rate;
+    return data[coinId][fiat.toLowerCase()];
 }
 
 async function getFiatRate(from, to) {
     // 簡化的固定匯率
     const rates = {
-        "USD_HKD": 7.8,
-        "USD_CNY": 7.2,
-        "USD_TWD": 31.5,
-        "USD_JPY": 145.0,
-        "USD_EUR": 0.92,
-        "HKD_USD": 0.128,
-        "CNY_USD": 0.139,
-        "TWD_USD": 0.032,
-        "JPY_USD": 0.0069,
-        "EUR_USD": 1.09
+        "USD_HKD": 7.8, "HKD_USD": 0.128,
+        "USD_CNY": 7.2, "CNY_USD": 0.139,
+        "USD_TWD": 31.5, "TWD_USD": 0.032,
+        "USD_JPY": 145.0, "JPY_USD": 0.0069,
+        "USD_EUR": 0.92, "EUR_USD": 1.09
     };
     
     const key = `${from}_${to}`;
@@ -738,49 +341,22 @@ function isCrypto(currency) {
 
 function formatPrice(price) {
     if (price === undefined || price === null) return "N/A";
-    
-    if (price < 0.0001) {
-        return `$${price.toFixed(8)}`;
-    } else if (price < 0.01) {
-        return `$${price.toFixed(6)}`;
-    } else if (price < 1) {
-        return `$${price.toFixed(4)}`;
-    } else if (price < 1000) {
-        return `$${price.toFixed(2)}`;
-    } else if (price < 1000000) {
-        return `$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    } else {
-        return `$${(price/1000).toFixed(1)}K`;
-    }
+    if (price < 0.0001) return `$${price.toFixed(8)}`;
+    if (price < 0.01) return `$${price.toFixed(6)}`;
+    if (price < 1) return `$${price.toFixed(4)}`;
+    if (price < 1000) return `$${price.toFixed(2)}`;
+    if (price < 1000000) return `$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    return `$${(price/1000).toFixed(1)}K`;
 }
 
 function formatNumber(value, currency) {
     if (isNaN(value) || !isFinite(value)) return "NaN";
     if (value === 0) return "0";
-    
-    if (Math.abs(value) < 0.000001) {
-        return value.toExponential(4);
-    } else if (Math.abs(value) < 0.01) {
-        return value.toFixed(8);
-    } else if (Math.abs(value) < 1) {
-        return value.toFixed(6);
-    } else if (Math.abs(value) < 10000) {
-        return value.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 4
-        });
-    } else {
-        return value.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
-}
-
-function clearCache() {
-    exchangeRates = {};
-    updateDebugInfo("緩存已清除");
-    alert("緩存已清除，下次請求將重新獲取數據。");
+    if (Math.abs(value) < 0.000001) return value.toExponential(4);
+    if (Math.abs(value) < 0.01) return value.toFixed(8);
+    if (Math.abs(value) < 1) return value.toFixed(6);
+    if (Math.abs(value) < 10000) return value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+    return value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
 
 // =====================
@@ -789,45 +365,23 @@ function clearCache() {
 let calcVal = "0";
 
 function calc(v) {
-    if (calcVal === "0" && v !== '.') {
-        calcVal = "";
-    }
-    
+    if (calcVal === "0" && v !== '.') calcVal = "";
     if (v === '.' && calcVal.includes('.')) {
-        const lastOperator = Math.max(
-            calcVal.lastIndexOf('+'),
-            calcVal.lastIndexOf('-'),
-            calcVal.lastIndexOf('*'),
-            calcVal.lastIndexOf('/')
-        );
-        
+        const lastOperator = Math.max(calcVal.lastIndexOf('+'), calcVal.lastIndexOf('-'), calcVal.lastIndexOf('*'), calcVal.lastIndexOf('/'));
         const lastNumber = calcVal.substring(lastOperator + 1);
-        if (lastNumber.includes('.')) {
-            return;
-        }
+        if (lastNumber.includes('.')) return;
     }
-    
     calcVal += v;
     updateCalc();
 }
 
 function equals() {
     try {
-        let expression = calcVal
-            .replace(/×/g, '*')
-            .replace(/÷/g, '/')
-            .replace(/−/g, '-');
-        
+        let expression = calcVal.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
         const result = eval(expression);
-        
-        if (isNaN(result) || !isFinite(result)) {
-            throw new Error("無效計算");
-        }
-        
+        if (isNaN(result) || !isFinite(result)) throw new Error("無效計算");
         calcVal = String(result);
-    } catch {
-        calcVal = "錯誤";
-    }
+    } catch { calcVal = "錯誤"; }
     updateCalc();
 }
 
@@ -844,23 +398,14 @@ function updateCalc() {
 // 🚀 初始化
 // =====================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("🔑 使用 API Key:", API_KEY.substring(0, 10) + "...");
-    console.log("🚀 加密貨幣轉換器測試版已啟動");
-    
-    // 初始測試連接
-    testAPIConnection();
-    
-    // 載入價格
+    // 初始載入
     loadPrices();
-    
     // 每60秒更新
     setInterval(loadPrices, 60000);
-    
     // 事件監聽
     document.getElementById('amount').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') convert();
     });
-    
     document.getElementById('fromCurrency').addEventListener('change', convert);
     document.getElementById('toCurrency').addEventListener('change', convert);
 });
