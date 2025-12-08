@@ -14,7 +14,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
             padding: 20px;
         }
@@ -35,9 +35,21 @@
 
         .price-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 15px;
             text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .price-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .price-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .price-item {
@@ -45,17 +57,30 @@
             padding: 12px;
             border-radius: 6px;
             border-left: 4px solid #0a84ff;
+            transition: transform 0.2s;
+        }
+
+        .price-item:hover {
+            transform: translateY(-2px);
+            background: #2a2a2a;
         }
 
         .price-symbol {
             font-weight: bold;
             color: #0a84ff;
             font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .price-name {
+            font-size: 10px;
+            color: #aaa;
+            margin-bottom: 3px;
         }
 
         .price-value {
             font-size: 16px;
-            margin-top: 5px;
+            font-weight: bold;
         }
 
         .card {
@@ -152,6 +177,26 @@
             font-size: 12px;
             display: inline-block;
             margin-left: 10px;
+            transition: background 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            background: #444;
+        }
+        
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .currency-count {
+            font-size: 12px;
+            color: #0a84ff;
+            background: rgba(10, 132, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -162,35 +207,65 @@
     
     <!-- 固定價格顯示區塊 -->
     <div class="price-banner">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div class="header-controls">
             <h3 style="margin: 0;">📊 即時加密貨幣價格 (USD)</h3>
-            <div class="refresh-btn" onclick="loadPrices()" title="手動更新">🔄 更新</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="currency-count">10 種貨幣</div>
+                <div class="refresh-btn" onclick="loadPrices()" title="手動更新">🔄 更新</div>
+            </div>
         </div>
+        
         <div id="priceContainer" class="price-grid">
-            <!-- 價格將動態載入 -->
+            <!-- 價格將動態載入，共10個幣種 -->
             <div class="price-item">
                 <div class="price-symbol">BTC</div>
+                <div class="price-name">Bitcoin</div>
                 <div class="price-value" id="btc-price">載入中...</div>
             </div>
             <div class="price-item">
                 <div class="price-symbol">ETH</div>
+                <div class="price-name">Ethereum</div>
                 <div class="price-value" id="eth-price">載入中...</div>
             </div>
             <div class="price-item">
                 <div class="price-symbol">SOL</div>
+                <div class="price-name">Solana</div>
                 <div class="price-value" id="sol-price">載入中...</div>
             </div>
             <div class="price-item">
                 <div class="price-symbol">BNB</div>
+                <div class="price-name">Binance Coin</div>
                 <div class="price-value" id="bnb-price">載入中...</div>
             </div>
             <div class="price-item">
                 <div class="price-symbol">XRP</div>
+                <div class="price-name">Ripple</div>
                 <div class="price-value" id="xrp-price">載入中...</div>
             </div>
             <div class="price-item">
                 <div class="price-symbol">DOGE</div>
+                <div class="price-name">Dogecoin</div>
                 <div class="price-value" id="doge-price">載入中...</div>
+            </div>
+            <div class="price-item">
+                <div class="price-symbol">ADA</div>
+                <div class="price-name">Cardano</div>
+                <div class="price-value" id="ada-price">載入中...</div>
+            </div>
+            <div class="price-item">
+                <div class="price-symbol">PEPE</div>
+                <div class="price-name">Pepe</div>
+                <div class="price-value" id="pepe-price">載入中...</div>
+            </div>
+            <div class="price-item">
+                <div class="price-symbol">ZEC</div>
+                <div class="price-name">Zcash</div>
+                <div class="price-value" id="zec-price">載入中...</div>
+            </div>
+            <div class="price-item">
+                <div class="price-symbol">SUI</div>
+                <div class="price-name">Sui</div>
+                <div class="price-value" id="sui-price">載入中...</div>
             </div>
         </div>
         <div id="lastUpdated" class="last-updated">最後更新時間: --</div>
@@ -212,6 +287,9 @@
             <option value="ADA">ADA (Cardano)</option>
             <option value="XRP">XRP (Ripple)</option>
             <option value="DOGE">DOGE (Dogecoin)</option>
+            <option value="PEPE">PEPE (Pepe)</option>
+            <option value="ZEC">ZEC (Zcash)</option>
+            <option value="SUI">SUI (Sui)</option>
             <option value="SHIB">SHIB (Shiba Inu)</option>
             <option value="USDT">USDT (Tether)</option>
             <option value="USDC">USDC (USD Coin)</option>
@@ -230,6 +308,7 @@
             <!-- 加密貨幣 -->
             <option value="BTC">BTC (Bitcoin)</option>
             <option value="ETH">ETH (Ethereum)</option>
+            <option value="SOL">SOL (Solana)</option>
             <option value="USDT">USDT (Tether)</option>
         </select>
         
@@ -269,28 +348,48 @@
 // =====================
 const API_BASE = "https://api.coingecko.com/api/v3";
 
-// 簡化的加密貨幣對應表
+// 擴展的加密貨幣對應表（共10個幣種）
 const CRYPTO_IDS = {
     BTC: "bitcoin",
     ETH: "ethereum",
     SOL: "solana",
     BNB: "binancecoin",
-    ADA: "cardano",
     XRP: "ripple",
     DOGE: "dogecoin",
+    ADA: "cardano",
+    PEPE: "pepe",
+    ZEC: "zcash",
+    SUI: "sui",
     SHIB: "shiba-inu",
     USDT: "tether",
     USDC: "usd-coin"
 };
 
-// 要顯示的熱門幣種
-const HOT_CRYPTO = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE"];
+// 要顯示的10個熱門幣種
+const HOT_CRYPTO = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE", "ADA", "PEPE", "ZEC", "SUI"];
+
+// 幣種全名對照
+const CRYPTO_NAMES = {
+    BTC: "Bitcoin",
+    ETH: "Ethereum",
+    SOL: "Solana",
+    BNB: "Binance Coin",
+    XRP: "Ripple",
+    DOGE: "Dogecoin",
+    ADA: "Cardano",
+    PEPE: "Pepe",
+    ZEC: "Zcash",
+    SUI: "Sui",
+    SHIB: "Shiba Inu",
+    USDT: "Tether",
+    USDC: "USD Coin"
+};
 
 // 緩存匯率數據
 let exchangeRates = {};
 
 // =====================
-// 🔥 即時價格顯示
+// 🔥 即時價格顯示（10個幣種）
 // =====================
 async function loadPrices() {
     try {
@@ -303,7 +402,7 @@ async function loadPrices() {
             }
         });
         
-        // 獲取熱門幣種的 ID
+        // 獲取幣種的 ID
         const coinIds = HOT_CRYPTO.map(symbol => CRYPTO_IDS[symbol]).filter(Boolean);
         
         if (coinIds.length === 0) {
@@ -456,6 +555,9 @@ async function convert() {
                 <div style="font-size: 14px; color: #aaa;">
                     匯率: 1 ${from} = ${formattedRate} ${to}
                 </div>
+                <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                    轉換時間: ${new Date().toLocaleTimeString('zh-HK')}
+                </div>
             </div>
         `;
         
@@ -490,12 +592,30 @@ async function getCryptoToFiatRate(crypto, fiat) {
     const res = await fetch(url);
     
     if (!res.ok) {
+        // 如果特定貨幣對失敗，嘗試通過 USD 中轉
+        if (fiat !== "USD") {
+            console.log(`嘗試通過 USD 中轉 ${crypto} → ${fiat}`);
+            const usdRate = await getCryptoToFiatRate(crypto, "USD");
+            const usdToFiat = await getFiatRate("USD", fiat);
+            const rate = usdRate * usdToFiat;
+            exchangeRates[cacheKey] = rate;
+            return rate;
+        }
         throw new Error(`API 錯誤: ${res.status}`);
     }
     
     const data = await res.json();
     
     if (!data[coinId] || data[coinId][fiat.toLowerCase()] === undefined) {
+        // 如果直接獲取失敗，嘗試通過 USD 中轉
+        if (fiat !== "USD") {
+            console.log(`通過 USD 中轉 ${crypto} → ${fiat}`);
+            const usdRate = await getCryptoToFiatRate(crypto, "USD");
+            const usdToFiat = await getFiatRate("USD", fiat);
+            const rate = usdRate * usdToFiat;
+            exchangeRates[cacheKey] = rate;
+            return rate;
+        }
         throw new Error(`無法取得 ${crypto} 到 ${fiat} 的匯率`);
     }
     
@@ -507,6 +627,46 @@ async function getCryptoToFiatRate(crypto, fiat) {
     return rate;
 }
 
+// 獲取法幣匯率（簡化版本）
+async function getFiatRate(from, to) {
+    // 簡單的固定匯率（實際應用中應該使用外匯 API）
+    const fiatRates = {
+        "USD_HKD": 7.8,
+        "USD_CNY": 7.2,
+        "USD_TWD": 31.5,
+        "USD_JPY": 145.0,
+        "USD_EUR": 0.92,
+        "HKD_USD": 0.128,
+        "CNY_USD": 0.139,
+        "TWD_USD": 0.032,
+        "JPY_USD": 0.0069,
+        "EUR_USD": 1.09
+    };
+    
+    const key = `${from}_${to}`;
+    if (fiatRates[key]) {
+        return fiatRates[key];
+    }
+    
+    // 如果沒有直接匯率，嘗試反轉
+    const reverseKey = `${to}_${from}`;
+    if (fiatRates[reverseKey]) {
+        return 1 / fiatRates[reverseKey];
+    }
+    
+    // 通過 USD 中轉
+    if (from !== "USD" && to !== "USD") {
+        const fromToUSD = fiatRates[`${from}_USD`] || (1 / (fiatRates[`USD_${from}`] || 1));
+        const usdToTo = fiatRates[`USD_${to}`] || (1 / (fiatRates[`${to}_USD`] || 1));
+        
+        if (fromToUSD && usdToTo) {
+            return fromToUSD * usdToTo;
+        }
+    }
+    
+    throw new Error(`不支援的匯率對: ${from} to ${to}`);
+}
+
 // 檢查是否為加密貨幣
 function isCrypto(currency) {
     return CRYPTO_IDS.hasOwnProperty(currency);
@@ -516,14 +676,18 @@ function isCrypto(currency) {
 function formatPrice(price) {
     if (price === undefined || price === null) return "N/A";
     
-    if (price < 0.01) {
+    if (price < 0.0001) {
+        return `$${price.toFixed(8)}`;
+    } else if (price < 0.01) {
         return `$${price.toFixed(6)}`;
     } else if (price < 1) {
         return `$${price.toFixed(4)}`;
     } else if (price < 1000) {
         return `$${price.toFixed(2)}`;
-    } else {
+    } else if (price < 1000000) {
         return `$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    } else {
+        return `$${(price/1000).toFixed(1)}K`;
     }
 }
 
@@ -536,13 +700,13 @@ function formatNumber(value, currency) {
     // 根據數值大小決定格式
     if (value === 0) return "0";
     
-    if (value < 0.000001) {
+    if (Math.abs(value) < 0.000001) {
         return value.toExponential(4);
-    } else if (value < 0.01) {
+    } else if (Math.abs(value) < 0.01) {
         return value.toFixed(8);
-    } else if (value < 1) {
+    } else if (Math.abs(value) < 1) {
         return value.toFixed(6);
-    } else if (value < 10000) {
+    } else if (Math.abs(value) < 10000) {
         return value.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 4
@@ -634,8 +798,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('toCurrency').addEventListener('change', convert);
     
     // 頁面載入時顯示提示
-    console.log("加密貨幣轉換器已載入");
-    console.log("使用免費 CoinGecko API - 可能有限制");
+    console.log("加密貨幣轉換器已載入 - 顯示10種加密貨幣");
+    console.log("使用免費 CoinGecko API");
 });
 </script>
 </body>
