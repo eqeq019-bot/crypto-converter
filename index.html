@@ -72,6 +72,11 @@
             cursor: pointer;
         }
 
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
         #result {
             padding: 15px;
             margin-top: 10px;
@@ -79,6 +84,14 @@
             border-radius: 8px;
             text-align: center;
             font-size: 20px;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .success {
+            color: #4cd964;
         }
 
         /* Calculator */
@@ -103,6 +116,10 @@
             font-size: 18px;
             background: #333;
         }
+
+        .loading {
+            color: #0a84ff;
+        }
     </style>
 </head>
 
@@ -112,7 +129,7 @@
 
     <!-- 🔥 熱門幣滾動價格 Banner -->
     <div class="price-banner">
-        <div id="banner" class="scrolling">載入中...</div>
+        <div id="banner" class="scrolling">載入即時價格...</div>
     </div>
 
     <!-- 🔥 轉換器 -->
@@ -120,7 +137,7 @@
         <h2>幣值轉換</h2>
 
         <label>金額</label>
-        <input type="number" id="amount" value="1" step="any">
+        <input type="number" id="amount" value="1" step="any" min="0.00000001">
 
         <label>從</label>
         <select id="fromCurrency">
@@ -145,7 +162,7 @@
             <option>TWD</option>
         </select>
 
-        <button onclick="convert()">立即轉換</button>
+        <button id="convertBtn" onclick="convert()">立即轉換</button>
 
         <div id="result">結果會顯示在此</div>
     </div>
@@ -182,7 +199,9 @@
 </div>
 
 <script>
-const API_KEY = "CG-uv86KDk1FuMqbYqFmxtuAUL8";
+// =====================
+// 🔥 配置
+// =====================
 const API = "https://api.coingecko.com/api/v3";
 
 const CRYPTO_IDS = {
@@ -201,22 +220,42 @@ const CRYPTO_IDS = {
 // 🔥 熱門幣 Banner
 // =====================
 async function loadBanner() {
-    const coins = ["bitcoin", "ethereum", "dogecoin", "tether", "binancecoin", "solana"];
+    try {
+        const coins = ["bitcoin", "ethereum", "dogecoin", "tether", "binancecoin", "solana"];
+        const url = `${API}/simple/price?ids=${coins.join(",")}&vs_currencies=usd`;
 
-    const url = `${API}/simple/price?ids=${coins.join(",")}&vs_currencies=usd`;
-
-    const res = await fetch(url, {
-        headers: { "x-cg-pro-api-key": API_KEY }
-    });
-
-    const data = await res.json();
-
-    let text = "";
-    for (let id of coins) {
-        text += `${id.toUpperCase()}: $${data[id].usd} ｜ `;
+        const res = await fetch(url);
+        
+        if (!res.ok) {
+            throw new Error(`API 錯誤: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        let text = "";
+        for (let id of coins) {
+            if (data[id] && data[id].usd) {
+                const price = data[id].usd.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 8
+                });
+                const symbol = id.toUpperCase();
+                text += `${symbol}: $${price} ｜ `;
+            }
+        }
+        
+        if (text) {
+            document.getElementById("banner").innerText = text;
+            document.getElementById("banner").className = "scrolling success";
+        } else {
+            throw new Error("無數據");
+        }
+        
+    } catch (error) {
+        console.error("載入價格失敗:", error);
+        document.getElementById("banner").innerText = "⚠️ 價格載入失敗，請稍後重試";
+        document.getElementById("banner").className = "scrolling error";
     }
-
-    document.getElementById("banner").innerText = text;
 }
 
 // =====================
@@ -226,22 +265,69 @@ async function convert() {
     const amount = parseFloat(document.getElementById("amount").value);
     const from = document.getElementById("fromCurrency").value;
     const to = document.getElementById("toCurrency").value;
-
-    const coinId = CRYPTO_IDS[from];
-
-    const url = `${API}/simple/price?ids=${coinId}&vs_currencies=${to.toLowerCase()}`;
-
-    const res = await fetch(url, {
-        headers: { "x-cg-pro-api-key": API_KEY }
-    });
-
-    const data = await res.json();
-
-    const rate = data[coinId][to.toLowerCase()];
-    const result = amount * rate;
-
-    document.getElementById("result").innerText =
-        `${amount} ${from} = ${result.toLocaleString()} ${to}`;
+    const resultDiv = document.getElementById("result");
+    const convertBtn = document.getElementById("convertBtn");
+    
+    // 驗證輸入
+    if (isNaN(amount) || amount <= 0) {
+        resultDiv.innerHTML = '<span class="error">請輸入有效金額</span>';
+        return;
+    }
+    
+    try {
+        // 顯示載入狀態
+        convertBtn.disabled = true;
+        convertBtn.textContent = "轉換中...";
+        resultDiv.innerHTML = '<span class="loading">取得匯率中...</span>';
+        
+        const coinId = CRYPTO_IDS[from];
+        if (!coinId) {
+            throw new Error("不支援的加密貨幣");
+        }
+        
+        // 構建 API URL
+        const vsCurrency = to.toLowerCase();
+        const url = `${API}/simple/price?ids=${coinId}&vs_currencies=${vsCurrency}`;
+        
+        // 發送請求
+        const res = await fetch(url);
+        
+        if (!res.ok) {
+            throw new Error(`API 錯誤: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        // 檢查數據
+        if (!data[coinId] || !data[coinId][vsCurrency]) {
+            throw new Error("無法取得匯率");
+        }
+        
+        const rate = data[coinId][vsCurrency];
+        const result = amount * rate;
+        
+        // 格式化結果
+        const formattedResult = result.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 8
+        });
+        
+        // 顯示結果
+        resultDiv.innerHTML = `
+            <div class="success">
+                ${amount} ${from} = ${formattedResult} ${to}<br>
+                <small>匯率: 1 ${from} = ${rate.toLocaleString()} ${to}</small>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error("轉換失敗:", error);
+        resultDiv.innerHTML = `<span class="error">轉換失敗: ${error.message}</span>`;
+    } finally {
+        // 恢復按鈕狀態
+        convertBtn.disabled = false;
+        convertBtn.textContent = "立即轉換";
+    }
 }
 
 // =====================
@@ -250,14 +336,45 @@ async function convert() {
 let calcVal = "0";
 
 function calc(v) {
-    if (calcVal === "0") calcVal = "";
+    if (calcVal === "0" && v !== '.') {
+        calcVal = "";
+    }
+    
+    // 防止多個小數點
+    if (v === '.' && calcVal.includes('.')) {
+        const lastOperator = Math.max(
+            calcVal.lastIndexOf('+'),
+            calcVal.lastIndexOf('-'),
+            calcVal.lastIndexOf('*'),
+            calcVal.lastIndexOf('/')
+        );
+        
+        const lastNumber = calcVal.substring(lastOperator + 1);
+        if (lastNumber.includes('.')) {
+            return;
+        }
+    }
+    
     calcVal += v;
     updateCalc();
 }
 
 function equals() {
     try {
-        calcVal = String(Function("return " + calcVal)());
+        // 替換顯示用的符號
+        let expression = calcVal
+            .replace(/×/g, '*')
+            .replace(/÷/g, '/')
+            .replace(/−/g, '-');
+        
+        // 安全計算
+        const result = eval(expression);
+        
+        if (isNaN(result) || !isFinite(result)) {
+            throw new Error("無效計算");
+        }
+        
+        calcVal = String(result);
     } catch {
         calcVal = "錯誤";
     }
@@ -276,8 +393,24 @@ function updateCalc() {
 // =====================
 // 🚀 初始化
 // =====================
-loadBanner();
-setInterval(loadBanner, 20000);
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始載入
+    loadBanner();
+    
+    // 每30秒更新一次價格
+    setInterval(loadBanner, 30000);
+    
+    // 按 Enter 鍵觸發轉換
+    document.getElementById('amount').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            convert();
+        }
+    });
+    
+    // 切換貨幣時自動轉換
+    document.getElementById('fromCurrency').addEventListener('change', convert);
+    document.getElementById('toCurrency').addEventListener('change', convert);
+});
 </script>
 </body>
 </html>
