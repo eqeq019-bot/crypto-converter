@@ -24,7 +24,7 @@
             margin-bottom: 10px;
         }
 
-        /* 修改：固定價格顯示，取消滾動 */
+        /* 固定價格顯示 */
         .price-banner {
             background: #1a1a1a;
             border-radius: 8px;
@@ -143,6 +143,16 @@
             color: #888;
             margin-top: 10px;
         }
+        
+        .refresh-btn {
+            background: #333;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-block;
+            margin-left: 10px;
+        }
     </style>
 </head>
 
@@ -150,10 +160,14 @@
 <div class="container">
     <h1>加密貨幣轉換器</h1>
     
-    <!-- 修改：固定價格顯示區塊 -->
+    <!-- 固定價格顯示區塊 -->
     <div class="price-banner">
-        <h3 style="margin-top: 0; margin-bottom: 15px;">📊 即時加密貨幣價格</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0;">📊 即時加密貨幣價格 (USD)</h3>
+            <div class="refresh-btn" onclick="loadPrices()" title="手動更新">🔄 更新</div>
+        </div>
         <div id="priceContainer" class="price-grid">
+            <!-- 價格將動態載入 -->
             <div class="price-item">
                 <div class="price-symbol">BTC</div>
                 <div class="price-value" id="btc-price">載入中...</div>
@@ -197,26 +211,10 @@
             <option value="BNB">BNB (Binance Coin)</option>
             <option value="ADA">ADA (Cardano)</option>
             <option value="XRP">XRP (Ripple)</option>
-            <option value="DOT">DOT (Polkadot)</option>
-            
-            <!-- 其他加密貨幣 -->
             <option value="DOGE">DOGE (Dogecoin)</option>
             <option value="SHIB">SHIB (Shiba Inu)</option>
-            <option value="PEPE">PEPE (Pepe)</option>
-            <option value="AVAX">AVAX (Avalanche)</option>
-            <option value="MATIC">MATIC (Polygon)</option>
-            <option value="LINK">LINK (Chainlink)</option>
-            <option value="UNI">UNI (Uniswap)</option>
-            
-            <!-- 穩定幣 -->
             <option value="USDT">USDT (Tether)</option>
             <option value="USDC">USDC (USD Coin)</option>
-            <option value="DAI">DAI (Dai)</option>
-            
-            <!-- 更多選擇 -->
-            <option value="LTC">LTC (Litecoin)</option>
-            <option value="ATOM">ATOM (Cosmos)</option>
-            <option value="TRX">TRX (Tron)</option>
         </select>
         
         <label>到</label>
@@ -228,22 +226,15 @@
             <option value="TWD">TWD (新台幣)</option>
             <option value="JPY">JPY (日圓)</option>
             <option value="EUR">EUR (歐元)</option>
-            <option value="GBP">GBP (英鎊)</option>
-            <option value="KRW">KRW (韓元)</option>
-            <option value="SGD">SGD (新加坡元)</option>
-            <option value="AUD">AUD (澳元)</option>
             
             <!-- 加密貨幣 -->
             <option value="BTC">BTC (Bitcoin)</option>
             <option value="ETH">ETH (Ethereum)</option>
             <option value="USDT">USDT (Tether)</option>
-            <option value="USDC">USDC (USD Coin)</option>
-            <option value="BNB">BNB (Binance Coin)</option>
-            <option value="SOL">SOL (Solana)</option>
         </select>
         
         <button id="convertBtn" onclick="convert()">立即轉換</button>
-        <div id="result">結果會顯示在此</div>
+        <div id="result">輸入金額並選擇貨幣進行轉換</div>
     </div>
     
     <!-- 計算機 -->
@@ -274,50 +265,44 @@
 
 <script>
 // =====================
-// 🔧 配置
+// 🔧 配置 - 使用免費公共 API
 // =====================
-const API_KEY = "CG-uv86KDk1FuMqbYqFmxtuAUL8";
-const PRO_API = "https://pro-api.coingecko.com/api/v3";
+const API_BASE = "https://api.coingecko.com/api/v3";
 
-// 擴展的加密貨幣對應表
+// 簡化的加密貨幣對應表
 const CRYPTO_IDS = {
-    // 主要加密貨幣
     BTC: "bitcoin",
     ETH: "ethereum",
     SOL: "solana",
     BNB: "binancecoin",
     ADA: "cardano",
     XRP: "ripple",
-    DOT: "polkadot",
-    
-    // 其他加密貨幣
     DOGE: "dogecoin",
     SHIB: "shiba-inu",
-    PEPE: "pepe",
-    AVAX: "avalanche-2",
-    MATIC: "matic-network",
-    LINK: "chainlink",
-    UNI: "uniswap",
-    
-    // 穩定幣
     USDT: "tether",
-    USDC: "usd-coin",
-    DAI: "dai",
-    
-    // 更多選擇
-    LTC: "litecoin",
-    ATOM: "cosmos",
-    TRX: "tron"
+    USDC: "usd-coin"
 };
 
 // 要顯示的熱門幣種
 const HOT_CRYPTO = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE"];
 
+// 緩存匯率數據
+let exchangeRates = {};
+
 // =====================
-// 🔥 即時價格顯示（固定格式）
+// 🔥 即時價格顯示
 // =====================
 async function loadPrices() {
     try {
+        // 顯示載中狀態
+        HOT_CRYPTO.forEach(symbol => {
+            const element = document.getElementById(`${symbol.toLowerCase()}-price`);
+            if (element) {
+                element.textContent = "載入中...";
+                element.className = "price-value loading";
+            }
+        });
+        
         // 獲取熱門幣種的 ID
         const coinIds = HOT_CRYPTO.map(symbol => CRYPTO_IDS[symbol]).filter(Boolean);
         
@@ -325,13 +310,10 @@ async function loadPrices() {
             throw new Error("無有效的幣種");
         }
         
-        // 構建 API URL
-        let url = `${PRO_API}/simple/price?ids=${coinIds.join(",")}&vs_currencies=usd`;
+        // 構建 API URL - 免費 API
+        const url = `${API_BASE}/simple/price?ids=${coinIds.join(",")}&vs_currencies=usd`;
         
-        // 如果使用 Pro API 且有 key，添加查詢參數
-        if (API_KEY && PRO_API.includes('pro-api')) {
-            url += `&x_cg_pro_api_key=${API_KEY}`;
-        }
+        console.log("請求價格 URL:", url);
         
         const res = await fetch(url);
         
@@ -340,6 +322,7 @@ async function loadPrices() {
         }
         
         const data = await res.json();
+        console.log("價格 API 回應:", data);
         
         // 更新每個幣種的價格顯示
         HOT_CRYPTO.forEach(symbol => {
@@ -347,24 +330,17 @@ async function loadPrices() {
             const elementId = `${symbol.toLowerCase()}-price`;
             const element = document.getElementById(elementId);
             
-            if (element && data[coinId] && data[coinId].usd) {
+            if (element && data[coinId] && data[coinId].usd !== undefined) {
                 const price = data[coinId].usd;
-                // 根據價格大小決定顯示格式
-                let formattedPrice;
-                if (price < 0.01) {
-                    formattedPrice = `$${price.toFixed(8)}`;
-                } else if (price < 1) {
-                    formattedPrice = `$${price.toFixed(4)}`;
-                } else if (price < 1000) {
-                    formattedPrice = `$${price.toFixed(2)}`;
-                } else {
-                    formattedPrice = `$${price.toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    })}`;
-                }
+                const formattedPrice = formatPrice(price);
                 element.textContent = formattedPrice;
                 element.className = "price-value success";
+                
+                // 緩存匯率
+                exchangeRates[`${symbol}_USD`] = price;
+            } else {
+                element.textContent = "無數據";
+                element.className = "price-value error";
             }
         });
         
@@ -377,6 +353,8 @@ async function loadPrices() {
         });
         document.getElementById('lastUpdated').textContent = `最後更新時間: ${timeString}`;
         
+        return true;
+        
     } catch (error) {
         console.error("載入價格失敗:", error);
         HOT_CRYPTO.forEach(symbol => {
@@ -387,7 +365,8 @@ async function loadPrices() {
                 element.className = "price-value error";
             }
         });
-        document.getElementById('lastUpdated').textContent = "更新失敗";
+        document.getElementById('lastUpdated').textContent = `更新失敗: ${error.message}`;
+        return false;
     }
 }
 
@@ -411,39 +390,72 @@ async function convert() {
         convertBtn.textContent = "轉換中...";
         resultDiv.innerHTML = '<span class="loading">取得匯率中...</span>';
         
-        // 如果兩者都是加密貨幣，需要通過 USD 中轉
-        let result;
-        let rate;
+        let result, rate;
         
-        if (isCrypto(from) && isCrypto(to)) {
-            // 加密貨幣 → 加密貨幣
-            const fromRate = await getExchangeRate(from, "USD");
-            const toRate = await getExchangeRate(to, "USD");
+        // 情況1: 加密貨幣 → 法幣
+        if (isCrypto(from) && !isCrypto(to)) {
+            rate = await getCryptoToFiatRate(from, to);
+            result = amount * rate;
+        }
+        // 情況2: 法幣 → 加密貨幣
+        else if (!isCrypto(from) && isCrypto(to)) {
+            rate = await getCryptoToFiatRate(to, from); // 反過來獲取匯率
+            result = amount / rate;
+        }
+        // 情況3: 加密貨幣 → 加密貨幣
+        else if (isCrypto(from) && isCrypto(to)) {
+            const fromRate = await getCryptoToFiatRate(from, "USD");
+            const toRate = await getCryptoToFiatRate(to, "USD");
             rate = fromRate / toRate;
             result = amount * rate;
-        } else if (isCrypto(from)) {
-            // 加密貨幣 → 法幣
-            rate = await getExchangeRate(from, to);
-            result = amount * rate;
-        } else if (isCrypto(to)) {
-            // 法幣 → 加密貨幣
-            rate = await getExchangeRate(to, from); // 注意：這裡反過來
-            result = amount / rate;
-        } else {
-            // 法幣 → 法幣（暫時不支持，可通過 USD 中轉實現）
-            throw new Error("法幣之間轉換暫不支持");
+        }
+        // 情況4: 法幣 → 法幣（簡化處理）
+        else {
+            // 簡單的固定匯率（僅供演示）
+            const simpleRates = {
+                "HKD_USD": 0.128,
+                "USD_HKD": 7.8,
+                "HKD_CNY": 0.92,
+                "CNY_HKD": 1.09,
+                "HKD_TWD": 4.0,
+                "TWD_HKD": 0.25,
+                "HKD_JPY": 18.5,
+                "JPY_HKD": 0.054,
+                "HKD_EUR": 0.118,
+                "EUR_HKD": 8.5
+            };
+            
+            const key = `${from}_${to}`;
+            if (simpleRates[key]) {
+                rate = simpleRates[key];
+                result = amount * rate;
+            } else {
+                // 通過 USD 中轉
+                const toUSD = simpleRates[`${from}_USD`] || (1 / (simpleRates[`USD_${from}`] || 1));
+                const fromUSD = simpleRates[`USD_${to}`] || (1 / (simpleRates[`${to}_USD`] || 1));
+                
+                if (toUSD && fromUSD) {
+                    rate = toUSD * fromUSD;
+                    result = amount * rate;
+                } else {
+                    throw new Error("不支援此貨幣對轉換");
+                }
+            }
         }
         
-        // 格式化結果
+        // 格式化顯示
+        const formattedAmount = formatNumber(amount, from);
         const formattedResult = formatNumber(result, to);
         const formattedRate = formatNumber(rate, "rate");
         
         resultDiv.innerHTML = `
             <div class="success">
                 <div style="font-size: 24px; margin-bottom: 10px;">
-                    ${formatNumber(amount, from)} ${from} = ${formattedResult} ${to}
+                    ${formattedAmount} ${from} = ${formattedResult} ${to}
                 </div>
-                <small>匯率: 1 ${from} = ${formattedRate} ${to}</small>
+                <div style="font-size: 14px; color: #aaa;">
+                    匯率: 1 ${from} = ${formattedRate} ${to}
+                </div>
             </div>
         `;
         
@@ -456,26 +468,24 @@ async function convert() {
     }
 }
 
-// 檢查是否為加密貨幣
-function isCrypto(currency) {
-    return CRYPTO_IDS.hasOwnProperty(currency);
-}
-
-// 獲取匯率
-async function getExchangeRate(from, to) {
-    const fromId = CRYPTO_IDS[from];
-    const toLower = to.toLowerCase();
+// 獲取加密貨幣到法幣的匯率
+async function getCryptoToFiatRate(crypto, fiat) {
+    const cacheKey = `${crypto}_${fiat}`;
     
-    if (!fromId) {
-        throw new Error(`不支援的貨幣: ${from}`);
+    // 檢查緩存
+    if (exchangeRates[cacheKey]) {
+        return exchangeRates[cacheKey];
+    }
+    
+    const coinId = CRYPTO_IDS[crypto];
+    if (!coinId) {
+        throw new Error(`不支援的加密貨幣: ${crypto}`);
     }
     
     // 構建 API URL
-    let url = `${PRO_API}/simple/price?ids=${fromId}&vs_currencies=${toLower}`;
+    const url = `${API_BASE}/simple/price?ids=${coinId}&vs_currencies=${fiat.toLowerCase()}`;
     
-    if (API_KEY && PRO_API.includes('pro-api')) {
-        url += `&x_cg_pro_api_key=${API_KEY}`;
-    }
+    console.log("請求匯率 URL:", url);
     
     const res = await fetch(url);
     
@@ -485,11 +495,36 @@ async function getExchangeRate(from, to) {
     
     const data = await res.json();
     
-    if (!data[fromId] || !data[fromId][toLower]) {
-        throw new Error(`無法取得 ${from} 到 ${to} 的匯率`);
+    if (!data[coinId] || data[coinId][fiat.toLowerCase()] === undefined) {
+        throw new Error(`無法取得 ${crypto} 到 ${fiat} 的匯率`);
     }
     
-    return data[fromId][toLower];
+    const rate = data[coinId][fiat.toLowerCase()];
+    
+    // 緩存結果
+    exchangeRates[cacheKey] = rate;
+    
+    return rate;
+}
+
+// 檢查是否為加密貨幣
+function isCrypto(currency) {
+    return CRYPTO_IDS.hasOwnProperty(currency);
+}
+
+// 格式化價格顯示
+function formatPrice(price) {
+    if (price === undefined || price === null) return "N/A";
+    
+    if (price < 0.01) {
+        return `$${price.toFixed(6)}`;
+    } else if (price < 1) {
+        return `$${price.toFixed(4)}`;
+    } else if (price < 1000) {
+        return `$${price.toFixed(2)}`;
+    } else {
+        return `$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
 }
 
 // 格式化數字顯示
@@ -498,26 +533,12 @@ function formatNumber(value, currency) {
         return "NaN";
     }
     
-    // 根據貨幣類型決定格式
-    if (currency === "rate") {
-        if (value < 0.000001) {
-            return value.toExponential(4);
-        } else if (value < 0.01) {
-            return value.toFixed(8);
-        } else if (value < 1) {
-            return value.toFixed(6);
-        } else if (value < 1000) {
-            return value.toFixed(4);
-        } else {
-            return value.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-    }
+    // 根據數值大小決定格式
+    if (value === 0) return "0";
     
-    // 根據實際貨幣格式化
-    if (value < 0.01) {
+    if (value < 0.000001) {
+        return value.toExponential(4);
+    } else if (value < 0.01) {
         return value.toFixed(8);
     } else if (value < 1) {
         return value.toFixed(6);
@@ -535,7 +556,7 @@ function formatNumber(value, currency) {
 }
 
 // =====================
-// 🔢 計算機（保持不變）
+// 🔢 計算機
 // =====================
 let calcVal = "0";
 
@@ -598,8 +619,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 初始載入價格
     loadPrices();
     
-    // 每30秒更新一次價格
-    setInterval(loadPrices, 30000);
+    // 每60秒更新一次價格（免費API限制較多）
+    setInterval(loadPrices, 60000);
     
     // 按 Enter 鍵觸發轉換
     document.getElementById('amount').addEventListener('keypress', function(e) {
@@ -612,8 +633,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('fromCurrency').addEventListener('change', convert);
     document.getElementById('toCurrency').addEventListener('change', convert);
     
-    // 初始轉換
-    setTimeout(convert, 1000);
+    // 頁面載入時顯示提示
+    console.log("加密貨幣轉換器已載入");
+    console.log("使用免費 CoinGecko API - 可能有限制");
 });
 </script>
 </body>
