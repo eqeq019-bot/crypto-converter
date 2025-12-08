@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>加密貨幣轉換器 | 即時匯率</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- icons & font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- 標題區域 -->
         <header class="header">
             <div class="logo">
                 <i class="fas fa-coins"></i>
@@ -19,157 +25,140 @@
             <p class="subtitle">支援 BTC、ETH、DOGE、PEPE 等即時價格轉換</p>
         </header>
 
-        <!-- 主要轉換區域 -->
-        <main class="converter">
-            <div class="converter-card">
-                <!-- 輸入區域 -->
-                <div class="input-section">
-                    <div class="amount-input">
-                        <label for="amount">金額</label>
-                        <div class="input-group">
-                            <input type="number" id="amount" value="1" min="0" step="any">
-                            <button class="btn-clear" onclick="clearAmount()">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
+        <!-- Banner (熱門幣) -->
+        <section id="bannerSection" class="banner">
+            <div id="cryptoBanner" class="crypto-banner">載入熱門幣…</div>
+        </section>
 
-                    <div class="currency-selectors">
-                        <!-- 從加密貨幣 -->
-                        <div class="currency-select">
-                            <label for="fromCurrency">從</label>
-                            <select id="fromCurrency">
-                                <option value="BTC">BTC - 比特幣</option>
-                                <option value="ETH">ETH - 以太幣</option>
-                                <option value="DOGE">DOGE - 狗狗幣</option>
-                                <option value="PEPE">PEPE - 佩佩幣</option>
-                                <option value="USDT">USDT - 泰達幣</option>
-                                <option value="BNB">BNB - 幣安幣</option>
-                                <option value="XRP">XRP - 瑞波幣</option>
-                                <option value="ADA">ADA - 艾達幣</option>
-                                <option value="SOL">SOL - Solana</option>
-                            </select>
-                        </div>
+        <main class="main-grid">
+            <!-- Converter Card -->
+            <div class="card converter-card">
+                <h2>轉換器</h2>
 
-                        <!-- 交換按鈕 -->
-                        <div class="swap-btn-container">
-                            <button class="btn-swap" onclick="swapCurrencies()">
-                                <i class="fas fa-exchange-alt"></i>
-                            </button>
-                        </div>
-
-                        <!-- 到貨幣 -->
-                        <div class="currency-select">
-                            <label for="toCurrency">到</label>
-                            <select id="toCurrency">
-                                <option value="HKD">HKD - 港幣</option>
-                                <option value="USD">USD - 美元</option>
-                                <option value="CNY">CNY - 人民幣</option>
-                                <option value="JPY">JPY - 日圓</option>
-                                <option value="EUR">EUR - 歐元</option>
-                                <option value="TWD">TWD - 新台幣</option>
-                                <option value="USDT">USDT - 泰達幣</option>
-                                <option value="BTC">BTC - 比特幣</option>
-                                <option value="ETH">ETH - 以太幣</option>
-                            </select>
-                        </div>
+                <div class="field">
+                    <label>金額</label>
+                    <div class="input-group">
+                        <input id="amount" type="number" value="1" min="0" step="any" />
+                        <button class="btn-clear" onclick="clearAmount()"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
 
-                <!-- 結果區域 -->
-                <div class="result-section">
-                    <div class="result-display">
-                        <div class="result-amount" id="resultAmount">
-                            <span class="loading">載入中...</span>
-                        </div>
-                        <div class="result-details">
-                            <div class="rate-info">
-                                <i class="fas fa-sync-alt"></i>
-                                <span id="currentRate">正在獲取匯率...</span>
-                            </div>
-                            <div class="time-info" id="lastUpdate">
-                                最後更新: --
-                            </div>
-                        </div>
+                <div class="selectors">
+                    <div class="select-col">
+                        <label>從</label>
+                        <select id="fromCurrency">
+                            <option value="BTC">BTC - 比特幣</option>
+                            <option value="ETH">ETH - 以太幣</option>
+                            <option value="DOGE">DOGE - 狗狗幣</option>
+                            <option value="PEPE">PEPE - 佩佩幣</option>
+                            <option value="USDT">USDT - 泰達幣</option>
+                            <option value="BNB">BNB - 幣安幣</option>
+                            <option value="XRP">XRP - 瑞波幣</option>
+                            <option value="ADA">ADA - 艾達幣</option>
+                            <option value="SOL">SOL - Solana</option>
+                        </select>
                     </div>
 
-                    <!-- 立即轉換按鈕 -->
-                    <button class="btn-convert" onclick="convertCurrency()" id="convertBtn">
-                        <i class="fas fa-calculator"></i>
-                        立即轉換
+                    <div class="swap-col">
+                        <button class="btn-swap" onclick="swapCurrencies()"><i class="fas fa-exchange-alt"></i></button>
+                    </div>
+
+                    <div class="select-col">
+                        <label>到</label>
+                        <select id="toCurrency">
+                            <option value="HKD">HKD - 港幣</option>
+                            <option value="USD">USD - 美元</option>
+                            <option value="CNY">CNY - 人民幣</option>
+                            <option value="JPY">JPY - 日圓</option>
+                            <option value="EUR">EUR - 歐元</option>
+                            <option value="TWD">TWD - 新台幣</option>
+                            <option value="USDT">USDT - 泰達幣</option>
+                            <option value="BTC">BTC - 比特幣</option>
+                            <option value="ETH">ETH - 以太幣</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="result">
+                    <div id="resultAmount" class="resultAmount">載入中...</div>
+                    <div class="resultMeta">
+                        <div id="currentRate" class="currentRate">正在獲取匯率...</div>
+                        <div id="lastUpdate" class="lastUpdate">最後更新: --</div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="convertBtn" class="btn-primary" onclick="convertCurrency()">
+                        <i class="fas fa-calculator"></i> 立即轉換
                     </button>
                 </div>
 
-                <!-- 快捷貨幣 -->
-                <div class="quick-currencies">
-                    <h3><i class="fas fa-bolt"></i> 快速轉換</h3>
-                    <div class="quick-buttons" id="quickButtons">
-                        <!-- 動態生成 -->
-                    </div>
+                <div class="quick">
+                    <h4><i class="fas fa-bolt"></i> 快速</h4>
+                    <div id="quickButtons" class="quickButtons"></div>
                 </div>
             </div>
 
-            <!-- 計算機 -->
-            <div class="calculator-card">
-                <h3><i class="fas fa-calculator"></i> 計算機</h3>
-                <div class="calculator">
-                    <input type="text" id="calcDisplay" readonly value="0">
-                    <div class="calc-buttons">
+            <!-- Chart + Calculator -->
+            <div class="card right-card">
+                <h2>價格走勢 & 計算機</h2>
+
+                <div class="chart-row">
+                    <div class="chart-head">
+                        <label for="chartCoin">選擇幣種：</label>
+                        <select id="chartCoin" onchange="onChartCoinChange()">
+                            <option value="bitcoin">BTC</option>
+                            <option value="ethereum">ETH</option>
+                            <option value="solana">SOL</option>
+                            <option value="dogecoin">DOGE</option>
+                            <option value="pepe">PEPE</option>
+                        </select>
+                        <button class="btn-small" onclick="renderCryptoChart(getSelectedChartCoin())">刷新圖表</button>
+                    </div>
+                    <canvas id="cryptoChart" height="160"></canvas>
+                </div>
+
+                <div class="calc">
+                    <input id="calcDisplay" type="text" readonly value="0" />
+                    <div class="calcButtons">
                         <button onclick="calcInput('7')">7</button>
                         <button onclick="calcInput('8')">8</button>
                         <button onclick="calcInput('9')">9</button>
                         <button onclick="calcInput('/')">/</button>
-                        
+
                         <button onclick="calcInput('4')">4</button>
                         <button onclick="calcInput('5')">5</button>
                         <button onclick="calcInput('6')">6</button>
                         <button onclick="calcInput('*')">*</button>
-                        
+
                         <button onclick="calcInput('1')">1</button>
                         <button onclick="calcInput('2')">2</button>
                         <button onclick="calcInput('3')">3</button>
                         <button onclick="calcInput('-')">-</button>
-                        
+
                         <button onclick="calcInput('0')">0</button>
                         <button onclick="calcInput('.')">.</button>
                         <button onclick="calcCalculate()">=</button>
                         <button onclick="calcInput('+')">+</button>
-                        
-                        <button onclick="calcClear()" class="btn-clear-calc">C</button>
-                        <button onclick="calcBackspace()" class="btn-backspace">
-                            <i class="fas fa-backspace"></i>
-                        </button>
-                        <button onclick="useCalcResult()" class="btn-use-result">
-                            使用結果
-                        </button>
+
+                        <button class="btn-clear-calc" onclick="calcClear()">C</button>
+                        <button onclick="calcBackspace()"><i class="fas fa-backspace"></i></button>
+                        <button class="btn-use-result" onclick="useCalcResult()">使用結果</button>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- 狀態欄 -->
         <footer class="footer">
-            <div class="status-bar">
-                <div class="status-item">
-                    <i class="fas fa-database"></i>
-                    <span>數據源: CoinGecko API</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-sync-alt"></i>
-                    <span id="updateStatus">每30秒自動更新</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>即時數據 ∙ SSL安全</span>
-                </div>
+            <div class="status">
+                <span>數據源: CoinGecko (Pro)</span>
+                <span id="updateStatus">每30秒自動更新</span>
+                <span>SSL 安全</span>
             </div>
-            <div class="copyright">
-                <p>© 2023 加密貨幣轉換器 | 即時匯率工具</p>
-            </div>
+            <div class="copyright">© 2025 加密貨幣轉換器</div>
         </footer>
     </div>
 
-    <!-- 載入 JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
