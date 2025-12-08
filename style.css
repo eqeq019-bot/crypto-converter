@@ -1,440 +1,82 @@
-/* style.css */
+/* 基本 */
 :root {
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --secondary: #10b981;
+    --bg: #f6f9fc;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #0ea5a4;
     --danger: #ef4444;
-    --warning: #f59e0b;
-    --dark: #1f2937;
-    --light: #f9fafb;
-    --gray: #6b7280;
-    --border: #e5e7eb;
-    --card-bg: #ffffff;
-    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; font-family: "Noto Sans HK", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+body { margin:0; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+.container { max-width:1100px; margin:28px auto; padding:18px; }
 
-body {
-    font-family: 'Noto Sans HK', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    color: var(--dark);
-}
+/* header */
+.header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+.logo { display:flex; align-items:center; gap:10px; }
+.logo i { font-size:28px; color:var(--accent); }
+.logo h1 { margin:0; font-size:20px; }
+.subtitle { color:var(--muted); margin:0 0 0 12px; font-size:13px; }
 
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+/* banner */
+.banner { margin: 12px 0; }
+.crypto-banner { display:flex; gap:12px; padding:8px; background:linear-gradient(90deg,#fff,#f8fafb); border-radius:8px; overflow:hidden; }
+.banner-item { display:flex; gap:8px; align-items:center; padding:6px 10px; border-right:1px solid #eee; min-width:120px; }
+.banner-item strong { width:60px; text-transform:uppercase; }
+.banner-item span { font-weight:600; }
 
-/* 標題區域 */
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-    color: white;
-}
+/* layout */
+.main-grid { display:grid; grid-template-columns: 1fr 420px; gap:18px; align-items:start; }
 
-.logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 10px;
-}
+/* card */
+.card { background:var(--card); border-radius:10px; padding:14px; box-shadow: 0 6px 18px rgba(15,23,42,0.04); }
+.converter-card h2, .right-card h2 { margin:0 0 12px 0; }
 
-.logo i {
-    font-size: 2.5rem;
-    color: #fbbf24;
-}
+/* form */
+.field label { font-size:13px; color:var(--muted); display:block; margin-bottom:6px; }
+.input-group { display:flex; gap:8px; }
+.input-group input { flex:1; padding:10px; border-radius:8px; border:1px solid #e6eef6; font-size:16px; outline:none; }
+.btn-clear { background:#f3f4f6; border:none; padding:8px 10px; border-radius:8px; cursor:pointer; }
 
-.logo h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-}
+/* selects */
+.selectors { display:flex; gap:12px; margin-top:12px; align-items:flex-end; }
+.select-col { flex:1; }
+.select-col select { width:100%; padding:10px; border-radius:8px; border:1px solid #e6eef6; }
 
-.subtitle {
-    font-size: 1rem;
-    opacity: 0.9;
-}
+/* swap */
+.swap-col { display:flex; align-items:center; }
+.btn-swap { background:var(--accent); color:#fff; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; }
 
-/* 主要轉換區域 */
-.converter {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 25px;
-}
+/* result */
+.result { margin-top:12px; padding:10px; border-radius:8px; background:#f8fafb; }
+.resultAmount { font-size:18px; font-weight:600; }
+.resultMeta { display:flex; justify-content:space-between; margin-top:8px; color:var(--muted); font-size:13px; }
 
-@media (min-width: 992px) {
-    .converter {
-        grid-template-columns: 2fr 1fr;
-    }
-}
+/* actions */
+.actions { margin-top:12px; }
+.btn-primary { background:var(--accent); color:#fff; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; }
 
-.converter-card, .calculator-card {
-    background: var(--card-bg);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: var(--shadow);
-}
+/* quick */
+.quick { margin-top:14px; }
+.quickButtons button { margin:6px 6px 6px 0; padding:8px 10px; border-radius:8px; border:1px solid #e6eef6; background:#fff; cursor:pointer; }
 
-/* 輸入區域 */
-.input-section {
-    margin-bottom: 25px;
-}
+/* chart & calc */
+.chart-row { margin-bottom:12px; }
+.chart-head { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+#cryptoChart { background:#fff; border-radius:8px; padding:8px; }
+.calc input { width:100%; padding:10px; border-radius:8px; border:1px solid #e6eef6; font-size:18px; margin-bottom:8px; }
+.calcButtons { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; }
+.calcButtons button { padding:10px; border-radius:8px; border:1px solid #e6eef6; background:#fff; cursor:pointer; }
 
-.amount-input {
-    margin-bottom: 20px;
-}
+/* footer */
+.footer { margin-top:18px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; }
 
-.amount-input label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--gray);
-}
+/* small */
+.btn-small { padding:6px 10px; border-radius:6px; border:1px solid #e6eef6; background:#fff; cursor:pointer; font-size:13px; }
+.result-highlight { color:var(--accent); font-weight:700; }
 
-.input-group {
-    display: flex;
-    gap: 10px;
-}
-
-.input-group input {
-    flex: 1;
-    padding: 15px 20px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    font-size: 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.input-group input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-}
-
-.btn-clear {
-    background: var(--light);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    width: 60px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-clear:hover {
-    background: #f3f4f6;
-    border-color: var(--gray);
-}
-
-/* 貨幣選擇器 */
-.currency-selectors {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 15px;
-    align-items: end;
-}
-
-.currency-select {
-    flex: 1;
-}
-
-.currency-select label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--gray);
-}
-
-.currency-select select {
-    width: 100%;
-    padding: 15px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 500;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.currency-select select:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-/* 交換按鈕 */
-.swap-btn-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding-bottom: 20px;
-}
-
-.btn-swap {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-swap:hover {
-    background: var(--primary-dark);
-    transform: rotate(180deg);
-}
-
-/* 結果區域 */
-.result-section {
-    background: linear-gradient(135deg, #f6f7ff 0%, #f0f1ff 100%);
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 25px;
-    border: 2px solid var(--border);
-}
-
-.result-display {
-    margin-bottom: 20px;
-}
-
-.result-amount {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 10px;
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-}
-
-.result-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--gray);
-    font-size: 0.9rem;
-}
-
-.rate-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.rate-info i {
-    color: var(--primary);
-}
-
-.btn-convert {
-    width: 100%;
-    padding: 18px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.btn-convert:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-}
-
-.btn-convert:active {
-    transform: translateY(0);
-}
-
-/* 快捷貨幣 */
-.quick-currencies {
-    margin-top: 25px;
-}
-
-.quick-currencies h3 {
-    margin-bottom: 15px;
-    color: var(--dark);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.quick-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-}
-
-.quick-buttons button {
-    padding: 12px;
-    background: var(--light);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-
-.quick-buttons button:hover {
-    background: #f3f4f6;
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-/* 計算機 */
-.calculator-card h3 {
-    margin-bottom: 20px;
-    color: var(--dark);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.calculator {
-    background: var(--light);
-    border-radius: 12px;
-    padding: 20px;
-}
-
-#calcDisplay {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 1.5rem;
-    text-align: right;
-    background: white;
-}
-
-.calc-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
-
-.calc-buttons button {
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: white;
-    border: 2px solid var(--border);
-}
-
-.calc-buttons button:hover {
-    background: #f3f4f6;
-}
-
-.calc-buttons button:active {
-    transform: scale(0.95);
-}
-
-.btn-clear-calc {
-    background: var(--danger) !important;
-    color: white !important;
-    border: none !important;
-}
-
-.btn-backspace {
-    background: var(--warning) !important;
-    color: white !important;
-    border: none !important;
-}
-
-.btn-use-result {
-    grid-column: span 2;
-    background: var(--secondary) !important;
-    color: white !important;
-    border: none !important;
-}
-
-/* 狀態欄 */
-.footer {
-    margin-top: 30px;
-    text-align: center;
-    color: white;
-}
-
-.status-bar {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-}
-
-.status-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
-.copyright {
-    opacity: 0.7;
-    font-size: 0.85rem;
-}
-
-/* 載入動畫 */
-.loading {
-    color: var(--gray);
-    font-style: italic;
-}
-
-/* 響應式設計 */
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 1.8rem;
-    }
-    
-    .converter-card, .calculator-card {
-        padding: 20px;
-    }
-    
-    .currency-selectors {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-    }
-    
-    .swap-btn-container {
-        padding: 10px 0;
-        order: 3;
-    }
-    
-    .result-amount {
-        font-size: 2rem;
-    }
-    
-    .status-bar {
-        flex-direction: column;
-        gap: 15px;
-    }
+/* responsive */
+@media (max-width:980px) {
+    .main-grid { grid-template-columns: 1fr; }
 }
