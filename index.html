@@ -34,12 +34,31 @@
         @media (max-width: 480px) { .price-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
-<div id="crypto-banner">
-  <div class="coin" id="btc">🟠 BTC <span>--</span></div>
-  <div class="coin" id="eth">🟣 ETH <span>--</span></div>
-  <div class="coin" id="sol">🟡 SOL <span>--</span></div>
-  <div class="coin" id="doge">🔵 DOGE <span>--</span></div>
-</div>
+<script>
+async function loadPrices() {
+  try {
+    const res = await fetch('/api/price');
+    const data = await res.json();
+
+    document.querySelector('#btc span').textContent =
+      `$${data.bitcoin.usd.toLocaleString()}`;
+
+    document.querySelector('#eth span').textContent =
+      `$${data.ethereum.usd.toLocaleString()}`;
+
+    document.querySelector('#sol span').textContent =
+      `$${data.solana.usd.toLocaleString()}`;
+
+    document.querySelector('#doge span').textContent =
+      `$${data.dogecoin.usd.toFixed(4)}`;
+  } catch (err) {
+    console.error('Price load failed', err);
+  }
+}
+
+loadPrices();
+setInterval(loadPrices, 30000); // 每 30 秒更新
+</script>    
 <body>
 <div class="container">
 
